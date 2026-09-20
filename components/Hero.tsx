@@ -104,6 +104,36 @@ export default function Hero({
     }
   }, []);
 
+  // Phone + socials content for the in-flow contact panel below the CTA buttons.
+  const contactPanelContent = (
+    <>
+      <a
+        href={CONTACT.phoneHref}
+        dir="ltr"
+        className="flex items-center gap-3 rounded-2xl px-1 py-1 text-sm font-bold text-white transition hover:bg-white/10"
+      >
+        <span className="icon-chip !h-9 !w-9">
+          <Phone className="h-4 w-4" />
+        </span>
+        {CONTACT.phoneDisplay}
+      </a>
+      <div className="flex items-center justify-center gap-2 border-t border-white/20 pt-2 sm:pt-3">
+        {socials.map(({ icon: Icon, href, label }) => (
+          <a
+            key={label}
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={label}
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition hover:bg-white/25"
+          >
+            <Icon className="h-4 w-4" />
+          </a>
+        ))}
+      </div>
+    </>
+  );
+
   return (
     <section className="relative flex min-h-screen w-full items-center overflow-hidden">
       {/* Page-specific doctor image background — full section height & width, doctor centered */}
@@ -125,6 +155,7 @@ export default function Hero({
             src={photoSrc}
             alt={pick(lang, { ar: "صورة الدكتور محمود حسان", en: "Dr. Mahmoud Hassan portrait" })}
             onError={() => setPhotoFailed(true)}
+            fetchPriority="high"
             className="h-full w-full object-cover object-top"
           />
         )}
@@ -133,7 +164,7 @@ export default function Hero({
       <div className="hero-photo-fade absolute inset-0 -z-10" />
       <div className="absolute inset-0 -z-10 bg-mesh-medical opacity-25" />
 
-      <div className="relative mx-auto flex w-full max-w-7xl flex-col justify-center px-4 pb-24 pt-32 sm:px-6 lg:px-8">
+      <div className="relative mx-auto flex w-full max-w-7xl flex-col justify-center px-4 pb-8 pt-16 sm:px-6 sm:pb-24 sm:pt-32 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -152,7 +183,7 @@ export default function Hero({
             {pick(lang, description ?? DOCTOR.title)}
           </p>
 
-          <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center lg:justify-start">
+          <div className="mt-5 flex flex-col items-center gap-3 sm:mt-8 sm:flex-row sm:gap-4 sm:justify-center lg:justify-start">
             {(() => {
               const PrimaryIcon = CTA_ICONS[primaryCta.icon ?? "calendar"];
               return isClientRoute(primaryCta.href) ? (
@@ -182,41 +213,18 @@ export default function Hero({
               );
             })()}
           </div>
+
+          {/* Contact panel — in-flow below the CTA buttons on every screen size */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.7 }}
+            className="glass-panel mx-auto mt-3 flex w-fit flex-col gap-2 p-3 sm:mt-6 sm:gap-3 sm:p-4 lg:mx-0"
+          >
+            {contactPanelContent}
+          </motion.div>
         </motion.div>
       </div>
-
-      {/* Floating glassmorphic contact panel — aligned with the CTA buttons row */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5, duration: 0.7 }}
-        className="glass-panel absolute top-[calc(50%+108px)] end-6 z-30 hidden -translate-y-1/2 flex-col gap-3 p-4 sm:flex"
-      >
-        <a
-          href={CONTACT.phoneHref}
-          dir="ltr"
-          className="flex items-center gap-3 rounded-2xl px-1 py-1 text-sm font-bold text-white transition hover:bg-white/10"
-        >
-          <span className="icon-chip !h-9 !w-9">
-            <Phone className="h-4 w-4" />
-          </span>
-          {CONTACT.phoneDisplay}
-        </a>
-        <div className="flex items-center justify-center gap-2 border-t border-white/20 pt-3">
-          {socials.map(({ icon: Icon, href, label }) => (
-            <a
-              key={label}
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={label}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition hover:bg-white/25"
-            >
-              <Icon className="h-4 w-4" />
-            </a>
-          ))}
-        </div>
-      </motion.div>
 
       {/* Scroll indicator */}
       <motion.div

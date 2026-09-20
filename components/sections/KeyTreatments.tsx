@@ -3,44 +3,21 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, ClipboardCheck, ScanSearch, Stethoscope, UsersRound } from "lucide-react";
+import { ArrowLeft, ArrowRight, Stethoscope } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { pick } from "@/lib/i18n";
+import type { Treatment } from "@/lib/supabase/types";
 import GlassCard from "../GlassCard";
 
-const treatments = [
-  {
-    icon: ScanSearch,
-    image: "/images/treatment-diagnosis.jpg",
-    title: { ar: "التقييم والتشخيص المبكر", en: "Early Diagnosis & Staging" },
-    description: {
-      ar: "تقييم شامل للحالة باستخدام أحدث وسائل التصوير والتحاليل لتحديد الخطة الأنسب.",
-      en: "A comprehensive workup using the latest imaging and diagnostics to define the right plan.",
-    },
-  },
-  {
-    icon: UsersRound,
-    image: "/images/treatment-team.jpg",
-    title: { ar: "خطط علاج متعددة التخصصات", en: "Multidisciplinary Treatment Plans" },
-    description: {
-      ar: "تنسيق كامل مع فرق الأورام الطبية والإشعاعية لتقديم رعاية متكاملة.",
-      en: "Full coordination with medical and radiation oncology teams for integrated care.",
-    },
-  },
-  {
-    icon: ClipboardCheck,
-    image: "/images/treatment-followup.jpg",
-    title: { ar: "متابعة ما بعد الجراحة", en: "Post-Surgical Follow-up" },
-    description: {
-      ar: "برنامج متابعة دقيق يضمن التعافي الآمن والسريع بعد التدخل الجراحي.",
-      en: "A structured follow-up program that ensures a safe, swift recovery after surgery.",
-    },
-  },
-];
+export interface KeyTreatmentsProps {
+  items: Treatment[];
+}
 
-export default function KeyTreatments() {
+export default function KeyTreatments({ items }: KeyTreatmentsProps) {
   const { lang } = useLanguage();
   const ArrowIcon = lang === "ar" ? ArrowLeft : ArrowRight;
+
+  if (items.length === 0) return null;
 
   return (
     <section className="relative px-4 py-20 sm:px-6 lg:px-8">
@@ -68,24 +45,26 @@ export default function KeyTreatments() {
         </motion.div>
 
         <div className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {treatments.map((item, index) => (
+          {items.map((item, index) => (
             <GlassCard
-              key={item.title.en}
+              key={item.id}
               index={index}
-              title={pick(lang, item.title)}
-              description={pick(lang, item.description)}
+              title={pick(lang, { ar: item.disease_name_ar, en: item.disease_name_en })}
+              description={pick(lang, { ar: item.treatment_overview_ar, en: item.treatment_overview_en })}
               media={
-                <Image
-                  src={item.image}
-                  alt={pick(lang, item.title)}
-                  fill
-                  sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                  className="object-cover"
-                />
+                item.image_url && (
+                  <Image
+                    src={item.image_url}
+                    alt={pick(lang, { ar: item.disease_name_ar, en: item.disease_name_en })}
+                    fill
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    className="object-cover"
+                  />
+                )
               }
               badge={
                 <span className="icon-chip">
-                  <item.icon className="h-5 w-5" />
+                  <Stethoscope className="h-5 w-5" />
                 </span>
               }
             />

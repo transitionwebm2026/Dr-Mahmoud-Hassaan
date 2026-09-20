@@ -3,60 +3,33 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Award, HeartHandshake, ShieldCheck, Sparkles, type LucideIcon } from "lucide-react";
+import { Award, ShieldCheck } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
-import { pick, type Bilingual } from "@/lib/i18n";
+import { pick } from "@/lib/i18n";
 import { DOCTOR } from "@/lib/constants";
 import { useIsMobile } from "@/lib/useIsMobile";
+import { DynamicIcon } from "@/lib/icon-registry";
+import type { WhyDoctorPoint } from "@/lib/supabase/types";
 
 const AUTO_ADVANCE_MS = 4500;
 
-const reasons: { icon: LucideIcon; title: Bilingual; description: Bilingual }[] = [
-  {
-    icon: Award,
-    title: { ar: "خبرة أكاديمية وعملية متميزة", en: "Distinguished Academic & Clinical Expertise" },
-    description: {
-      ar: "مدرس واستشاري جراحة الأورام بالمعهد القومي للأورام - جامعة القاهرة، بخبرة تمتد لأكثر من 15 عامًا.",
-      en: "Lecturer & Consultant of Surgical Oncology at the National Cancer Institute, Cairo University, with 15+ years of experience.",
-    },
-  },
-  {
-    icon: Sparkles,
-    title: { ar: "أحدث تقنيات الجراحة", en: "Latest Surgical Technology" },
-    description: {
-      ar: "استخدام تقنيات الجراحة بالمنظار والحد الأدنى من التدخل لتقليل الألم وتسريع التعافي.",
-      en: "Laparoscopic and minimally invasive techniques that reduce pain and accelerate recovery.",
-    },
-  },
-  {
-    icon: HeartHandshake,
-    title: { ar: "رعاية إنسانية شخصية", en: "Personalized, Compassionate Care" },
-    description: {
-      ar: "متابعة شخصية لكل مريض وشرح تفصيلي لكل خطوة في رحلة العلاج.",
-      en: "Personal follow-up with every patient and clear guidance through each step of care.",
-    },
-  },
-  {
-    icon: ShieldCheck,
-    title: { ar: "نتائج وأمان مثبت", en: "Proven Outcomes & Safety" },
-    description: {
-      ar: "سجل حافل من العمليات الناجحة وفق أعلى معايير السلامة العالمية.",
-      en: "A strong track record of successful surgeries under the highest global safety standards.",
-    },
-  },
-];
+export interface WhyChooseDoctorProps {
+  points: WhyDoctorPoint[];
+}
 
-export default function WhyChooseDoctor() {
+export default function WhyChooseDoctor({ points }: WhyChooseDoctorProps) {
   const { lang, dir } = useLanguage();
   const [active, setActive] = useState(0);
   const isMobile = useIsMobile();
+  const reasons = points;
 
   useEffect(() => {
+    if (reasons.length === 0) return;
     const timer = setInterval(() => {
       setActive((prev) => (prev + 1) % reasons.length);
     }, AUTO_ADVANCE_MS);
     return () => clearInterval(timer);
-  }, [active]);
+  }, [active, reasons.length]);
 
   // The list renders first (reading "start" side: right in RTL, left in LTR)
   // and the photo second (the "end" side) — each slides in from its own edge
@@ -67,6 +40,8 @@ export default function WhyChooseDoctor() {
   const listEnter = isMobile ? { opacity: 0, y: 32 } : { opacity: 0, x: dir === "rtl" ? 70 : -70 };
   const photoEnter = isMobile ? { opacity: 0, y: 32 } : { opacity: 0, x: dir === "rtl" ? -70 : 70 };
   const settled = isMobile ? { opacity: 1, y: 0 } : { opacity: 1, x: 0 };
+
+  if (reasons.length === 0) return null;
 
   return (
     <section className="relative px-4 py-20 sm:px-6 lg:px-8">
@@ -106,10 +81,9 @@ export default function WhyChooseDoctor() {
           >
             {reasons.map((reason, i) => {
               const isActive = i === active;
-              const ReasonIcon = reason.icon;
               return (
                 <button
-                  key={reason.title.en}
+                  key={reason.id}
                   type="button"
                   onClick={() => setActive(i)}
                   className={`relative block w-full overflow-hidden rounded-3xl border p-5 text-start transition-all duration-500 ${
@@ -138,11 +112,13 @@ export default function WhyChooseDoctor() {
                         transition={{ duration: 0.3 }}
                         className="absolute"
                       >
-                        <ReasonIcon className="h-5 w-5" />
+                        <DynamicIcon tag={reason.icon_tag} className="h-5 w-5" />
                       </motion.span>
                     </span>
                     <div className="flex-1 pt-1.5">
-                      <h3 className="font-extrabold text-ink">{pick(lang, reason.title)}</h3>
+                      <h3 className="font-extrabold text-ink">
+                        {pick(lang, { ar: reason.title_ar, en: reason.title_en })}
+                      </h3>
                       {isActive && (
                         <motion.p
                           initial={{ opacity: 0, height: 0 }}
@@ -150,7 +126,7 @@ export default function WhyChooseDoctor() {
                           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                           className="mt-2 text-sm leading-relaxed text-ink/60"
                         >
-                          {pick(lang, reason.description)}
+                          {pick(lang, { ar: reason.description_ar, en: reason.description_en })}
                         </motion.p>
                       )}
                     </div>

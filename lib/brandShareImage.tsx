@@ -14,7 +14,7 @@ export const shareImageAlt = `${DOCTOR.name.en} — ${DOCTOR.shortTitle.en}`;
  * predictable, unchanging local asset — see Next.js's guidance on reading
  * local files for `ImageResponse`.
  */
-const logoData = await readFile(join(process.cwd(), "public/images/mahmoud-hassan-logo.png"), "base64");
+const logoData = await readFile(join(process.cwd(), "public/images/logo-icon.png"), "base64");
 const logoSrc = `data:image/png;base64,${logoData}`;
 
 export function BrandShareImage() {
@@ -37,12 +37,12 @@ export function BrandShareImage() {
             justifyContent: "center",
             background: "white",
             borderRadius: 40,
-            padding: "64px 110px",
+            padding: 80,
             boxShadow: "0 40px 100px rgba(2, 20, 30, 0.35)",
           }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={logoSrc} width={440} height={417} alt="" />
+          <img src={logoSrc} width={420} height={420} alt="" />
         </div>
       </div>
     ),

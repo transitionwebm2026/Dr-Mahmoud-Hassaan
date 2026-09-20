@@ -1,18 +1,19 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Calendar, Clock, Sparkles } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { pick } from "@/lib/i18n";
-import type { Article } from "./articlesData";
+import { formatArticleDate, formatReadingTime } from "@/lib/supabase/content";
+import type { Article } from "@/lib/supabase/types";
 
 interface FeaturedArticleProps {
   article: Article;
-  onOpen: () => void;
 }
 
-export default function FeaturedArticle({ article, onOpen }: FeaturedArticleProps) {
+export default function FeaturedArticle({ article }: FeaturedArticleProps) {
   const { lang } = useLanguage();
   const ArrowIcon = lang === "ar" ? ArrowLeft : ArrowRight;
 
@@ -43,16 +44,18 @@ export default function FeaturedArticle({ article, onOpen }: FeaturedArticleProp
           className="glass-card grid grid-cols-1 overflow-hidden lg:grid-cols-2"
         >
           <div className="relative aspect-video w-full lg:aspect-auto">
-            <Image
-              src={article.image}
-              alt={pick(lang, article.title)}
-              fill
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              priority
-              className="object-cover"
-            />
+            {article.featured_image_url && (
+              <Image
+                src={article.featured_image_url}
+                alt={pick(lang, { ar: article.title_ar, en: article.title_en })}
+                fill
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                priority
+                className="object-cover"
+              />
+            )}
             <span className="absolute top-4 start-4 rounded-full bg-brand-gradient px-4 py-1.5 text-xs font-extrabold text-white shadow-glow-brand">
-              {pick(lang, article.category)}
+              {pick(lang, { ar: article.category_ar, en: article.category_en })}
             </span>
           </div>
 
@@ -60,25 +63,25 @@ export default function FeaturedArticle({ article, onOpen }: FeaturedArticleProp
             <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-semibold text-ink/50">
               <span className="flex items-center gap-1.5">
                 <Calendar className="h-3.5 w-3.5 text-brand-600" />
-                {pick(lang, article.date)}
+                {formatArticleDate(lang, article.published_at)}
               </span>
               <span className="flex items-center gap-1.5">
                 <Clock className="h-3.5 w-3.5 text-brand-600" />
-                {pick(lang, article.readTime)}
+                {formatReadingTime(lang, article.reading_time_minutes)}
               </span>
             </div>
 
             <h3 className="mt-4 text-xl font-extrabold leading-snug text-ink sm:text-2xl">
-              {pick(lang, article.title)}
+              {pick(lang, { ar: article.title_ar, en: article.title_en })}
             </h3>
             <p className="mt-3 text-sm leading-relaxed text-ink/60 sm:text-base">
-              {pick(lang, article.excerpt)}
+              {pick(lang, { ar: article.excerpt_ar, en: article.excerpt_en })}
             </p>
 
-            <button type="button" onClick={onOpen} className="btn-primary mt-6 w-fit">
+            <Link href={`/articles/${article.slug}`} className="btn-primary mt-6 w-fit">
               {pick(lang, { ar: "اقرأ المقال كامل", en: "Read Full Article" })}
               <ArrowIcon className="h-4 w-4" />
-            </button>
+            </Link>
           </div>
         </motion.div>
       </div>

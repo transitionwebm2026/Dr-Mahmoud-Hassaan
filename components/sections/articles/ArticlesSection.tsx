@@ -1,28 +1,20 @@
-"use client";
-
-import { useState } from "react";
-import { AnimatePresence } from "framer-motion";
-import { articles } from "./articlesData";
+import type { Article } from "@/lib/supabase/types";
 import FeaturedArticle from "./FeaturedArticle";
 import ArticlesGrid from "./ArticlesGrid";
-import ArticleModal from "./ArticleModal";
 
-const [featured, ...rest] = articles;
+export interface ArticlesSectionProps {
+  articles: Article[];
+}
 
-export default function ArticlesSection() {
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const selectedArticle = articles.find((a) => a.id === selectedId) ?? null;
+export default function ArticlesSection({ articles }: ArticlesSectionProps) {
+  if (articles.length === 0) return null;
+
+  const [featured, ...rest] = articles;
 
   return (
     <>
-      <FeaturedArticle article={featured} onOpen={() => setSelectedId(featured.id)} />
-      <ArticlesGrid articles={rest} onOpen={setSelectedId} />
-
-      <AnimatePresence>
-        {selectedArticle && (
-          <ArticleModal article={selectedArticle} onClose={() => setSelectedId(null)} />
-        )}
-      </AnimatePresence>
+      <FeaturedArticle article={featured} />
+      <ArticlesGrid articles={rest} />
     </>
   );
 }

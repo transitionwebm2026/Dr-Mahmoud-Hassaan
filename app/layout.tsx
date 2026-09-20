@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import { Cairo, Montserrat } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/context/LanguageContext";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import FloatingContactButtons from "@/components/FloatingContactButtons";
-import { DOCTOR, SITE_URL } from "@/lib/constants";
+import { DOCTOR, CONTACT, SOCIAL_LINKS } from "@/lib/constants";
+import { getSiteUrl } from "@/lib/site-url";
+
+const siteUrl = getSiteUrl();
 
 // Cairo stands in for the licensed "FF Shamel Family" until the real font
 // files are supplied (see the @font-face note in app/globals.css).
@@ -28,7 +28,7 @@ const siteDescription =
   `${DOCTOR.shortTitle.en} at the National Cancer Institute, Cairo University, with 15+ years of experience in breast, GI, and head & neck oncology surgery.`;
 
 export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
+  metadataBase: new URL(siteUrl),
   title: {
     template: `%s | ${DOCTOR.name.ar} — ${DOCTOR.name.en}`,
     default: `${DOCTOR.name.ar} | ${DOCTOR.shortTitle.ar} — ${DOCTOR.name.en} | ${DOCTOR.shortTitle.en}`,
@@ -81,6 +81,29 @@ export const metadata: Metadata = {
   },
 };
 
+// Sitewide structured data — describes the practice once for every page, so
+// search engines can attribute the whole site to a real Physician/medical
+// business (name, specialty, contact, social profiles) regardless of which
+// page a crawler lands on first.
+const physicianJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Physician",
+  name: DOCTOR.name.en,
+  alternateName: DOCTOR.name.ar,
+  description: DOCTOR.title.en,
+  url: siteUrl,
+  image: `${siteUrl}/images/logo-icon.png`,
+  telephone: CONTACT.phoneHref.replace("tel:", ""),
+  email: CONTACT.email,
+  medicalSpecialty: "https://schema.org/Oncologic",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: CONTACT.address.en,
+    addressCountry: "EG",
+  },
+  sameAs: [SOCIAL_LINKS.facebook, SOCIAL_LINKS.instagram, SOCIAL_LINKS.tiktok],
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
@@ -90,15 +113,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${arabicFont.variable} ${englishFont.variable}`}
     >
       <body className="min-h-screen overflow-x-hidden bg-mist text-ink antialiased">
-        <LanguageProvider>
-          <div className="relative flex min-h-screen flex-col">
-            <div className="pointer-events-none fixed inset-0 -z-10 bg-radial-glow" />
-            <Navbar />
-            <main className="flex-1">{children}</main>
-            <Footer />
-            <FloatingContactButtons />
-          </div>
-        </LanguageProvider>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(physicianJsonLd) }} />
+        <LanguageProvider>{children}</LanguageProvider>
       </body>
     </html>
   );

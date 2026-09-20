@@ -4,70 +4,18 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, HelpCircle } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
-import { pick, type Bilingual } from "@/lib/i18n";
+import { pick } from "@/lib/i18n";
+import type { Faq } from "@/lib/supabase/types";
 
-const faqs: { question: Bilingual; answer: Bilingual }[] = [
-  {
-    question: { ar: "كم من الوقت أحتاج للاستعداد قبل الجراحة؟", en: "How much time do I need to prepare before surgery?" },
-    answer: {
-      ar: "تختلف فترة التحضير حسب نوع الجراحة، وعادة ما تشمل أسبوعًا إلى أسبوعين لإجراء الفحوصات اللازمة وتقييم الحالة الصحية العامة.",
-      en: "Preparation time varies by procedure, typically one to two weeks for the required tests and a general health assessment.",
-    },
-  },
-  {
-    question: { ar: "ما هي الفحوصات المطلوبة قبل العملية؟", en: "What tests are required before the operation?" },
-    answer: {
-      ar: "تشمل عادة تحاليل دم شاملة، أشعة تصويرية (مثل الأشعة المقطعية أو الرنين المغناطيسي)، وتقييم القلب والتخدير حسب الحالة.",
-      en: "Typically comprehensive blood work, imaging (CT or MRI as needed), and a cardiac/anesthesia assessment based on the case.",
-    },
-  },
-  {
-    question: { ar: "كم تستغرق مدة الإقامة بالمستشفى بعد الجراحة؟", en: "How long is the hospital stay after surgery?" },
-    answer: {
-      ar: "تتراوح غالبًا بين يومين وخمسة أيام حسب نوع الجراحة وسرعة التعافي، وسيتم إبلاغك بالمدة المتوقعة في خطة العلاج.",
-      en: "Usually between two and five days depending on the procedure and recovery pace — the expected duration is shared in your treatment plan.",
-    },
-  },
-  {
-    question: { ar: "هل الجراحة بالمنظار مناسبة لحالتي؟", en: "Is laparoscopic surgery suitable for my case?" },
-    answer: {
-      ar: "تُناسب الجراحة بالمنظار عددًا كبيرًا من الحالات، وتُحدَّد ملاءمتها بعد التقييم الدقيق لموقع وحجم الورم.",
-      en: "Laparoscopic surgery suits a wide range of cases; suitability is confirmed after a precise review of the tumor's location and size.",
-    },
-  },
-  {
-    question: { ar: "متى يمكنني العودة لممارسة حياتي الطبيعية؟", en: "When can I return to normal life?" },
-    answer: {
-      ar: "تختلف فترة التعافي الكامل من أسبوعين إلى ستة أسابيع، مع إمكانية استئناف الأنشطة الخفيفة في وقت أبكر تحت إشراف طبي.",
-      en: "Full recovery ranges from two to six weeks, with light activity often possible sooner under medical guidance.",
-    },
-  },
-  {
-    question: { ar: "هل يلزم التوقف عن أدوية معينة قبل الجراحة؟", en: "Do I need to stop certain medications before surgery?" },
-    answer: {
-      ar: "قد يُطلب إيقاف بعض أدوية سيولة الدم أو المكملات قبل الجراحة بفترة محددة — سيتم مراجعة أدويتك بالتفصيل قبل الموعد.",
-      en: "Some blood thinners or supplements may need to be paused beforehand — your medications will be reviewed in detail ahead of the date.",
-    },
-  },
-  {
-    question: { ar: "كيف يتم التعامل مع الألم بعد العملية؟", en: "How is pain managed after the operation?" },
-    answer: {
-      ar: "يتم وضع خطة متكاملة لإدارة الألم تشمل أدوية مناسبة ومتابعة يومية لضمان راحة المريض خلال فترة التعافي.",
-      en: "A complete pain-management plan is put in place, with appropriate medication and daily follow-up for comfort during recovery.",
-    },
-  },
-  {
-    question: { ar: "هل تشمل الخدمة متابعة ما بعد الجراحة؟", en: "Does the service include post-surgical follow-up?" },
-    answer: {
-      ar: "نعم، تشمل رعايتنا برنامج متابعة دوري بعد الجراحة لضمان التعافي الآمن ورصد أي تطورات مبكرًا.",
-      en: "Yes — our care includes a regular post-surgical follow-up program to ensure safe recovery and catch any changes early.",
-    },
-  },
-];
+export interface ServicesFAQProps {
+  faqs: Faq[];
+}
 
-export default function ServicesFAQ() {
+export default function ServicesFAQ({ faqs }: ServicesFAQProps) {
   const { lang } = useLanguage();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  if (faqs.length === 0) return null;
 
   return (
     <section className="relative px-4 py-20 sm:px-6 lg:px-8">
@@ -103,7 +51,7 @@ export default function ServicesFAQ() {
             const isOpen = openIndex === index;
             return (
               <motion.div
-                key={faq.question.en}
+                key={faq.id}
                 initial={{ opacity: 0, scale: 0.95, y: 16 }}
                 whileInView={{ opacity: 1, scale: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
@@ -116,7 +64,9 @@ export default function ServicesFAQ() {
                   className="flex w-full items-center justify-between gap-4 p-5 text-start"
                   aria-expanded={isOpen}
                 >
-                  <span className="text-sm font-bold text-ink">{pick(lang, faq.question)}</span>
+                  <span className="text-sm font-bold text-ink">
+                    {pick(lang, { ar: faq.question_ar, en: faq.question_en })}
+                  </span>
                   <motion.span
                     animate={{ rotate: isOpen ? 180 : 0 }}
                     transition={{ duration: 0.3 }}
@@ -135,7 +85,7 @@ export default function ServicesFAQ() {
                       className="overflow-hidden"
                     >
                       <p className="px-5 pb-5 text-sm leading-relaxed text-ink/65">
-                        {pick(lang, faq.answer)}
+                        {pick(lang, { ar: faq.answer_ar, en: faq.answer_en })}
                       </p>
                     </motion.div>
                   )}

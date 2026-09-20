@@ -8,15 +8,32 @@ import { useLanguage } from "@/context/LanguageContext";
 import { pick } from "@/lib/i18n";
 import { DOCTOR } from "@/lib/constants";
 
-const highlights = [
-  { ar: "أكثر من 15 عامًا من الخبرة في جراحة الأورام", en: "15+ years of experience in surgical oncology" },
-  { ar: "أحدث تقنيات الجراحة بالمنظار والروبوت", en: "Latest laparoscopic & robotic-assisted techniques" },
-  { ar: "رعاية متكاملة من التشخيص وحتى التعافي", en: "Integrated care from diagnosis through recovery" },
+const DEFAULT_HIGHLIGHTS_AR = [
+  "أكثر من 15 عامًا من الخبرة في جراحة الأورام",
+  "أحدث تقنيات الجراحة بالمنظار والروبوت",
+  "رعاية متكاملة من التشخيص وحتى التعافي",
 ];
 
-export default function DoctorIntroVideo() {
+const DEFAULT_HIGHLIGHTS_EN = [
+  "15+ years of experience in surgical oncology",
+  "Latest laparoscopic & robotic-assisted techniques",
+  "Integrated care from diagnosis through recovery",
+];
+
+export interface DoctorIntroVideoProps {
+  highlightsAr?: string[];
+  highlightsEn?: string[];
+}
+
+export default function DoctorIntroVideo({
+  highlightsAr = DEFAULT_HIGHLIGHTS_AR,
+  highlightsEn = DEFAULT_HIGHLIGHTS_EN,
+}: DoctorIntroVideoProps) {
   const { lang } = useLanguage();
   const [playing, setPlaying] = useState(false);
+  const highlights = (highlightsAr.length === highlightsEn.length ? highlightsAr : DEFAULT_HIGHLIGHTS_AR).map(
+    (ar, i) => ({ ar, en: (highlightsEn.length === highlightsAr.length ? highlightsEn : DEFAULT_HIGHLIGHTS_EN)[i] })
+  );
 
   return (
     <section id="doctor-intro" className="relative px-4 py-20 sm:px-6 lg:px-8">

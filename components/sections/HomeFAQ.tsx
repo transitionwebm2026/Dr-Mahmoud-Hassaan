@@ -4,74 +4,18 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, HelpCircle } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
-import { pick, type Bilingual } from "@/lib/i18n";
+import { pick } from "@/lib/i18n";
+import type { Faq } from "@/lib/supabase/types";
 
-const faqs: { question: Bilingual; answer: Bilingual }[] = [
-  {
-    question: {
-      ar: "ما هي التخصصات الجراحية التي يقدمها الدكتور محمود حسان؟",
-      en: "What surgical specialties does Dr. Mahmoud Hassan offer?",
-    },
-    answer: {
-      ar: "جراحات أورام الثدي والجهاز الهضمي والغدد والرقبة، بما في ذلك الجراحة بالمنظار والحد الأدنى من التدخل.",
-      en: "Breast, GI, and head & neck / thyroid oncology surgery, including laparoscopic and minimally invasive techniques.",
-    },
-  },
-  {
-    question: {
-      ar: "هل يمكنني الحصول على استشارة قبل تحديد موعد الجراحة؟",
-      en: "Can I get a consultation before scheduling surgery?",
-    },
-    answer: {
-      ar: "بالتأكيد، تبدأ كل حالة باستشارة تفصيلية لمناقشة التشخيص والخيارات العلاجية المتاحة قبل اتخاذ أي قرار.",
-      en: "Absolutely — every case starts with a detailed consultation to discuss the diagnosis and available treatment options before any decision is made.",
-    },
-  },
-  {
-    question: {
-      ar: "هل تقدمون رأيًا ثانيًا لحالات تم تشخيصها من قبل أطباء آخرين؟",
-      en: "Do you offer a second opinion for cases diagnosed elsewhere?",
-    },
-    answer: {
-      ar: "نعم، نراجع التقارير والأشعة السابقة ونقدم رأيًا طبيًا مستقلًا حول التشخيص وأنسب خطة علاجية.",
-      en: "Yes — previous reports and imaging are reviewed to provide an independent medical opinion on the diagnosis and the most suitable treatment plan.",
-    },
-  },
-  {
-    question: {
-      ar: "كم تستغرق فترة التعافي بعد الجراحة عادةً؟",
-      en: "How long does recovery typically take after surgery?",
-    },
-    answer: {
-      ar: "تختلف حسب نوع الجراحة وحالة المريض، وتتراوح غالبًا بين أسبوعين وستة أسابيع للتعافي الكامل.",
-      en: "It varies by procedure and patient condition, typically ranging from two to six weeks for full recovery.",
-    },
-  },
-  {
-    question: {
-      ar: "كيف يمكنني حجز أول موعد لي؟",
-      en: "How can I book my first appointment?",
-    },
-    answer: {
-      ar: "يمكنك الحجز مباشرة عبر واتساب أو الاتصال بالعيادة، وسيقوم فريقنا بتحديد أقرب موعد مناسب لحالتك.",
-      en: "You can book directly via WhatsApp or by calling the clinic, and our team will arrange the nearest suitable appointment.",
-    },
-  },
-  {
-    question: {
-      ar: "هل تتوفر متابعة عن بُعد بعد انتهاء العلاج؟",
-      en: "Is remote follow-up available after treatment ends?",
-    },
-    answer: {
-      ar: "نعم، نوفر متابعة دورية عبر استشارات الفيديو لمتابعة التعافي دون الحاجة لزيارة العيادة في كل مرة.",
-      en: "Yes — we offer regular video-consultation follow-ups to track recovery without needing an in-person visit every time.",
-    },
-  },
-];
+export interface HomeFAQProps {
+  faqs: Faq[];
+}
 
-export default function HomeFAQ() {
+export default function HomeFAQ({ faqs }: HomeFAQProps) {
   const { lang } = useLanguage();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  if (faqs.length === 0) return null;
 
   return (
     <section className="relative px-4 py-20 sm:px-6 lg:px-8">
@@ -107,7 +51,7 @@ export default function HomeFAQ() {
             const isOpen = openIndex === index;
             return (
               <motion.div
-                key={faq.question.en}
+                key={faq.id}
                 initial={{ opacity: 0, scale: 0.95, y: 16 }}
                 whileInView={{ opacity: 1, scale: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
@@ -120,7 +64,9 @@ export default function HomeFAQ() {
                   className="flex w-full items-center justify-between gap-4 p-5 text-start"
                   aria-expanded={isOpen}
                 >
-                  <span className="text-sm font-bold text-ink">{pick(lang, faq.question)}</span>
+                  <span className="text-sm font-bold text-ink">
+                    {pick(lang, { ar: faq.question_ar, en: faq.question_en })}
+                  </span>
                   <motion.span
                     animate={{ rotate: isOpen ? 180 : 0 }}
                     transition={{ duration: 0.3 }}
@@ -139,7 +85,7 @@ export default function HomeFAQ() {
                       className="overflow-hidden"
                     >
                       <p className="px-5 pb-5 text-sm leading-relaxed text-ink/65">
-                        {pick(lang, faq.answer)}
+                        {pick(lang, { ar: faq.answer_ar, en: faq.answer_en })}
                       </p>
                     </motion.div>
                   )}

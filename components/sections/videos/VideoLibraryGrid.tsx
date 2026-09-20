@@ -2,101 +2,26 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { AnimatePresence, motion } from "framer-motion";
 import { Clapperboard, Play } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { pick } from "@/lib/i18n";
-import VideoModal, { type VideoEntry } from "./VideoModal";
+import type { Video } from "@/lib/supabase/types";
 
-const THUMBS = ["/images/video-thumb-1.jpg", "/images/video-thumb-2.jpg", "/images/video-thumb-3.jpg"];
+// Only needed once a card is clicked, so it's split into its own chunk
+// instead of shipping in the initial page bundle for every visitor.
+const VideoModal = dynamic(() => import("./VideoModal"), { ssr: false });
 
-const videos: VideoEntry[] = [
-  {
-    title: { ar: "كيف تكتشف أورام الثدي مبكرًا؟", en: "How to Detect Breast Cancer Early" },
-    description: {
-      ar: "علامات مبكرة يجب الانتباه لها وأهمية الفحص الدوري.",
-      en: "Early warning signs to watch for and why regular screening matters.",
-    },
-    duration: "02:14",
-    thumbnail: THUMBS[0],
-  },
-  {
-    title: { ar: "ماذا تتوقع في يوم العملية؟", en: "What to Expect on Surgery Day" },
-    description: {
-      ar: "خطوة بخطوة من الوصول إلى المستشفى وحتى غرفة العمليات.",
-      en: "A step-by-step walkthrough from hospital arrival to the operating room.",
-    },
-    duration: "03:05",
-    thumbnail: THUMBS[1],
-  },
-  {
-    title: { ar: "نصائح للتعافي بعد الجراحة", en: "Recovery Tips After Surgery" },
-    description: {
-      ar: "عادات يومية تسرّع التعافي وتقلل من المضاعفات.",
-      en: "Daily habits that speed up recovery and reduce complications.",
-    },
-    duration: "01:48",
-    thumbnail: THUMBS[2],
-  },
-  {
-    title: { ar: "الفحص الذاتي للثدي خطوة بخطوة", en: "Breast Self-Exam Step by Step" },
-    description: {
-      ar: "طريقة صحيحة وبسيطة لإجراء الفحص الذاتي في المنزل.",
-      en: "A simple, correct technique for performing a self-exam at home.",
-    },
-    duration: "02:40",
-    thumbnail: THUMBS[0],
-  },
-  {
-    title: { ar: "التغذية السليمة أثناء العلاج", en: "Proper Nutrition During Treatment" },
-    description: {
-      ar: "نصائح غذائية لدعم الجسم خلال رحلة العلاج.",
-      en: "Nutrition guidance to support the body throughout treatment.",
-    },
-    duration: "03:22",
-    thumbnail: THUMBS[1],
-  },
-  {
-    title: { ar: "الجراحة بالمنظار: ماذا تعني لك؟", en: "Laparoscopic Surgery: What It Means for You" },
-    description: {
-      ar: "الفرق بين الجراحة التقليدية والجراحة بالمنظار وفوائدها.",
-      en: "How laparoscopic surgery differs from open surgery, and its benefits.",
-    },
-    duration: "02:57",
-    thumbnail: THUMBS[2],
-  },
-  {
-    title: { ar: "أسئلة شائعة قبل الجراحة", en: "Common Questions Before Surgery" },
-    description: {
-      ar: "إجابات سريعة عن أكثر الأسئلة التي يطرحها المرضى.",
-      en: "Quick answers to the questions patients ask most often.",
-    },
-    duration: "02:05",
-    thumbnail: THUMBS[0],
-  },
-  {
-    title: { ar: "دور الفريق الطبي متعدد التخصصات", en: "The Role of the Multidisciplinary Team" },
-    description: {
-      ar: "كيف يتعاون فريق الأورام لوضع أفضل خطة علاجية.",
-      en: "How the oncology team collaborates to build the best treatment plan.",
-    },
-    duration: "03:11",
-    thumbnail: THUMBS[1],
-  },
-  {
-    title: { ar: "الحياة بعد التعافي الكامل", en: "Life After Full Recovery" },
-    description: {
-      ar: "قصص أمل ونصائح للعودة إلى الحياة الطبيعية بثقة.",
-      en: "Stories of hope and guidance for confidently returning to normal life.",
-    },
-    duration: "02:29",
-    thumbnail: THUMBS[2],
-  },
-];
+export interface VideoLibraryGridProps {
+  videos: Video[];
+}
 
-export default function VideoLibraryGrid() {
+export default function VideoLibraryGrid({ videos }: VideoLibraryGridProps) {
   const { lang } = useLanguage();
   const [selected, setSelected] = useState<number | null>(null);
+
+  if (videos.length === 0) return null;
 
   return (
     <section className="relative px-4 py-20 sm:px-6 lg:px-8">
@@ -126,7 +51,7 @@ export default function VideoLibraryGrid() {
         <div className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {videos.map((video, index) => (
             <motion.button
-              key={`${video.title.en}-${index}`}
+              key={video.id}
               type="button"
               onClick={() => setSelected(index)}
               initial={{ opacity: 0, scale: 0.92, y: 20 }}
@@ -137,13 +62,15 @@ export default function VideoLibraryGrid() {
               className="glass-card group cursor-pointer overflow-hidden text-start"
             >
               <div className="relative aspect-[9/16] w-full">
-                <Image
-                  src={video.thumbnail}
-                  alt={pick(lang, video.title)}
-                  fill
-                  sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                  className="object-cover"
-                />
+                {video.thumbnail_url && (
+                  <Image
+                    src={video.thumbnail_url}
+                    alt={pick(lang, { ar: video.title_ar, en: video.title_en })}
+                    fill
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    className="object-cover"
+                  />
+                )}
                 <div className="absolute inset-0 bg-deep-950/20 transition-colors duration-300 group-hover:bg-deep-950/35" />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="flex h-16 w-16 items-center justify-center rounded-full border border-white/40 bg-white/20 backdrop-blur-lg shadow-glow-brand transition-transform duration-300 group-hover:scale-110">
@@ -155,9 +82,9 @@ export default function VideoLibraryGrid() {
                 </span>
               </div>
               <div className="p-5">
-                <h3 className="font-extrabold text-ink">{pick(lang, video.title)}</h3>
+                <h3 className="font-extrabold text-ink">{pick(lang, { ar: video.title_ar, en: video.title_en })}</h3>
                 <p className="mt-1.5 text-sm leading-relaxed text-ink/60">
-                  {pick(lang, video.description)}
+                  {pick(lang, { ar: video.description_ar, en: video.description_en })}
                 </p>
               </div>
             </motion.button>

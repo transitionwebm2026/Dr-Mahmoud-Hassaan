@@ -16,20 +16,16 @@ import { pick, type Bilingual } from "@/lib/i18n";
 import { CONTACT } from "@/lib/constants";
 import { useTilt3D } from "@/lib/useTilt3D";
 import { useIsMobile } from "@/lib/useIsMobile";
-
-const WORKING_HOURS: { days: Bilingual; hours: Bilingual }[] = [
-  { days: { ar: "السبت – الخميس", en: "Saturday – Thursday" }, hours: { ar: "5 م – 9 م", en: "5 PM – 9 PM" } },
-  { days: { ar: "الجمعة", en: "Friday" }, hours: { ar: "مغلق", en: "Closed" } },
-];
+import type { ClinicSettings } from "@/lib/supabase/types";
 
 const AFFILIATIONS: { icon: LucideIcon; text: Bilingual }[] = [
   { icon: Building2, text: { ar: "جامعة القاهرة", en: "Cairo University" } },
   { icon: GraduationCap, text: { ar: "المعهد القومي للأورام", en: "National Cancer Institute" } },
 ];
 
-const mapQuery = encodeURIComponent(CONTACT.address.en);
-const mapEmbedSrc = `https://www.google.com/maps?q=${mapQuery}&output=embed`;
-const mapExternalHref = `https://www.google.com/maps/search/?api=1&query=${mapQuery}`;
+export interface ClinicInfoMapProps {
+  settings: ClinicSettings | null;
+}
 
 const rowContainer: Variants = {
   hidden: {},
@@ -74,7 +70,7 @@ function InfoRow({
   );
 }
 
-export default function ClinicInfoMap() {
+export default function ClinicInfoMap({ settings }: ClinicInfoMapProps) {
   const { lang, dir } = useLanguage();
   const { ref: tiltRef, rotateX, rotateY, onMouseMove, onMouseLeave } = useTilt3D();
   const isMobile = useIsMobile();
@@ -84,6 +80,29 @@ export default function ClinicInfoMap() {
   // the columns stack into one, so rise from below instead of sideways.
   const cardEnter = isMobile ? { opacity: 0, y: 36 } : { opacity: 0, x: dir === "rtl" ? -88 : 88, y: 24 };
   const cardSettled = isMobile ? { opacity: 1, y: 0 } : { opacity: 1, x: 0, y: 0 };
+
+  const addressAr = settings?.address_ar || CONTACT.address.ar;
+  const addressEn = settings?.address_en || CONTACT.address.en;
+  const phoneDisplay = settings?.emergency_line || settings?.phone_primary || CONTACT.phoneDisplay;
+  const phoneHref = phoneDisplay === CONTACT.phoneDisplay ? CONTACT.phoneHref : `tel:${phoneDisplay.replace(/[^\d+]/g, "")}`;
+
+  // Admin-editable "Days: Hours" lines (one per line); falls back to the
+  // site's original two-row schedule when nothing has been set yet.
+  const workingHoursRows = (lang === "ar" ? settings?.working_hours_ar : settings?.working_hours_en)
+    ?.split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const [days, ...rest] = line.split(":");
+      return { days: days?.trim() ?? line, hours: rest.join(":").trim() };
+    }) ?? [
+    { days: pick(lang, { ar: "السبت – الخميس", en: "Saturday – Thursday" }), hours: pick(lang, { ar: "5 م – 9 م", en: "5 PM – 9 PM" }) },
+    { days: pick(lang, { ar: "الجمعة", en: "Friday" }), hours: pick(lang, { ar: "مغلق", en: "Closed" }) },
+  ];
+
+  const mapQuery = encodeURIComponent(addressEn);
+  const mapEmbedSrc = settings?.map_embed_url || `https://www.google.com/maps?q=${mapQuery}&output=embed`;
+  const mapExternalHref = `https://www.google.com/maps/search/?api=1&query=${mapQuery}`;
 
   return (
     <motion.div
@@ -129,15 +148,15 @@ export default function ClinicInfoMap() {
 
         <div className="relative mt-2 divide-y divide-brand/10">
           <InfoRow icon={MapPin} label={{ ar: "العنوان", en: "Address" }}>
-            {pick(lang, CONTACT.address)}
+            {pick(lang, { ar: addressAr, en: addressEn })}
           </InfoRow>
 
           <InfoRow icon={Clock} label={{ ar: "مواعيد العمل", en: "Working Hours" }}>
             <ul className="space-y-1">
-              {WORKING_HOURS.map((row) => (
-                <li key={row.days.en} className="flex items-center justify-between gap-3 text-xs text-ink/70">
-                  <span className="font-bold text-ink">{pick(lang, row.days)}</span>
-                  <span className="font-english">{pick(lang, row.hours)}</span>
+              {workingHoursRows.map((row) => (
+                <li key={row.days} className="flex items-center justify-between gap-3 text-xs text-ink/70">
+                  <span className="font-bold text-ink">{row.days}</span>
+                  <span className="font-english">{row.hours}</span>
                 </li>
               ))}
             </ul>
@@ -145,11 +164,11 @@ export default function ClinicInfoMap() {
 
           <InfoRow icon={PhoneCall} label={{ ar: "خط الطوارئ والحجز", en: "Emergency & Booking Hotline" }} pulse>
             <a
-              href={CONTACT.phoneHref}
+              href={phoneHref}
               dir="ltr"
               className="font-english text-brand-700 transition hover:text-brand-500"
             >
-              {CONTACT.phoneDisplay}
+              {phoneDisplay}
             </a>
           </InfoRow>
         </div>

@@ -2,88 +2,18 @@
 
 import { useRef } from "react";
 import { motion, useInView, useScroll, useSpring, useTransform } from "framer-motion";
-import {
-  Award,
-  GraduationCap,
-  Milestone,
-  ShieldCheck,
-  Stethoscope,
-  Trophy,
-  type LucideIcon,
-} from "lucide-react";
+import { Milestone } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
-import { pick, type Bilingual } from "@/lib/i18n";
+import { pick } from "@/lib/i18n";
+import { DynamicIcon } from "@/lib/icon-registry";
+import type { CareerMilestone } from "@/lib/supabase/types";
 
-const milestones: { year: string; icon: LucideIcon; title: Bilingual; description: Bilingual }[] = [
-  {
-    year: "2008",
-    icon: GraduationCap,
-    title: { ar: "بكالوريوس الطب والجراحة", en: "MBBCh, Faculty of Medicine" },
-    description: {
-      ar: "تخرج بتقدير امتياز من كلية طب جامعة القاهرة.",
-      en: "Graduated with honors from the Faculty of Medicine, Cairo University.",
-    },
-  },
-  {
-    year: "2012",
-    icon: Stethoscope,
-    title: { ar: "الماجستير في الجراحة العامة", en: "Master's Degree in General Surgery" },
-    description: {
-      ar: "حصل على درجة الماجستير في الجراحة العامة من جامعة القاهرة.",
-      en: "Earned a Master's degree in General Surgery from Cairo University.",
-    },
-  },
-  {
-    year: "2015",
-    icon: Award,
-    title: { ar: "زمالة جراحة الأورام", en: "Fellowship in Surgical Oncology" },
-    description: {
-      ar: "أتم برنامج الزمالة في جراحة الأورام بالمعهد القومي للأورام.",
-      en: "Completed a fellowship in surgical oncology at the National Cancer Institute.",
-    },
-  },
-  {
-    year: "2018",
-    icon: GraduationCap,
-    title: { ar: "الدكتوراه في جراحة الأورام", en: "MD in Surgical Oncology" },
-    description: {
-      ar: "حصل على درجة الدكتوراه في جراحة الأورام من جامعة القاهرة.",
-      en: "Earned an MD in Surgical Oncology from Cairo University.",
-    },
-  },
-  {
-    year: "2020",
-    icon: ShieldCheck,
-    title: { ar: "استشاري جراحة الأورام", en: "Consultant of Surgical Oncology" },
-    description: {
-      ar: "تم تعيينه استشاريًا لجراحة الأورام بالمعهد القومي للأورام - جامعة القاهرة.",
-      en: "Appointed Consultant of Surgical Oncology at the National Cancer Institute, Cairo University.",
-    },
-  },
-  {
-    year: "2023",
-    icon: Trophy,
-    title: { ar: "عضو الجمعية المصرية لجراحة الأورام", en: "Member, Egyptian Society of Surgical Oncology" },
-    description: {
-      ar: "انضم إلى عضوية الجمعية المصرية لجراحة الأورام تقديرًا لإسهاماته العلمية.",
-      en: "Joined the Egyptian Society of Surgical Oncology in recognition of his scientific contributions.",
-    },
-  },
-];
-
-function TimelineNode({
-  milestone,
-  index,
-}: {
-  milestone: (typeof milestones)[number];
-  index: number;
-}) {
+function TimelineNode({ milestone, index }: { milestone: CareerMilestone; index: number }) {
   const { lang } = useLanguage();
   const ref = useRef<HTMLDivElement>(null);
   // A thin band around the viewport's vertical center — whichever node is
   // inside it right now is treated as the "current" one on the journey.
   const isActive = useInView(ref, { margin: "-45% 0px -45% 0px" });
-  const Icon = milestone.icon;
   const stagger = index % 2 === 0 ? "sm:ms-0" : "sm:ms-10";
 
   return (
@@ -99,7 +29,7 @@ function TimelineNode({
           isActive ? "bg-brand-gradient shadow-glow-brand" : "bg-ink/20"
         }`}
       >
-        <Icon className="h-5 w-5" strokeWidth={1.8} />
+        <DynamicIcon tag={milestone.icon_tag} className="h-5 w-5" strokeWidth={1.8} />
       </motion.span>
 
       <motion.div
@@ -115,16 +45,20 @@ function TimelineNode({
         <span className="font-english text-xs font-extrabold tracking-wide text-brand-600">
           {milestone.year}
         </span>
-        <h3 className="mt-1 font-extrabold text-ink">{pick(lang, milestone.title)}</h3>
+        <h3 className="mt-1 font-extrabold text-ink">{pick(lang, { ar: milestone.title_ar, en: milestone.title_en })}</h3>
         <p className="mt-1.5 text-sm leading-relaxed text-ink/60">
-          {pick(lang, milestone.description)}
+          {pick(lang, { ar: milestone.description_ar, en: milestone.description_en })}
         </p>
       </motion.div>
     </div>
   );
 }
 
-export default function CareerTimeline() {
+export interface CareerTimelineProps {
+  milestones: CareerMilestone[];
+}
+
+export default function CareerTimeline({ milestones }: CareerTimelineProps) {
   const { lang } = useLanguage();
   const trackRef = useRef<HTMLDivElement>(null);
 
@@ -181,7 +115,7 @@ export default function CareerTimeline() {
 
           <div className="space-y-10">
             {milestones.map((milestone, index) => (
-              <TimelineNode key={milestone.year} milestone={milestone} index={index} />
+              <TimelineNode key={milestone.id} milestone={milestone} index={index} />
             ))}
           </div>
         </div>

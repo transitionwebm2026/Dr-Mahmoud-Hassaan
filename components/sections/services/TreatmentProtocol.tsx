@@ -2,66 +2,32 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  ClipboardCheck,
-  Layers,
-  ScanSearch,
-  UsersRound,
-  Workflow,
-  type LucideIcon,
-} from "lucide-react";
+import { Workflow } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
-import { pick, type Bilingual } from "@/lib/i18n";
-
-const steps: { icon: LucideIcon; title: Bilingual; description: Bilingual }[] = [
-  {
-    icon: ScanSearch,
-    title: { ar: "التشخيص الدقيق", en: "Accurate Diagnosis" },
-    description: {
-      ar: "فحص إكلينيكي شامل وأحدث وسائل التصوير والتحاليل لتحديد طبيعة الحالة بدقة.",
-      en: "A thorough clinical exam plus the latest imaging and labs to precisely define the case.",
-    },
-  },
-  {
-    icon: Layers,
-    title: { ar: "تحديد مرحلة الورم", en: "Staging" },
-    description: {
-      ar: "تحديد حجم الورم ومدى انتشاره لاختيار المسار العلاجي الأنسب.",
-      en: "Determining the tumor's size and spread to select the most suitable treatment path.",
-    },
-  },
-  {
-    icon: UsersRound,
-    title: { ar: "القرار متعدد التخصصات", en: "Multidisciplinary Decision" },
-    description: {
-      ar: "مناقشة الحالة مع فريق متكامل من أطباء الأورام الطبية والإشعاعية.",
-      en: "The case is reviewed with a full team of medical and radiation oncologists.",
-    },
-  },
-  {
-    icon: ClipboardCheck,
-    title: { ar: "خطة العلاج المخصصة", en: "Personalized Treatment Plan" },
-    description: {
-      ar: "وضع وتنفيذ خطة علاجية (جراحة أو علاج) مصممة خصيصًا لحالة المريض.",
-      en: "Designing and executing a treatment plan (surgery or therapy) built around the patient.",
-    },
-  },
-];
+import { pick } from "@/lib/i18n";
+import { DynamicIcon } from "@/lib/icon-registry";
+import type { TreatmentProtocolStep } from "@/lib/supabase/types";
 
 const AUTO_ADVANCE_MS = 4500;
 
-export default function TreatmentProtocol() {
+export interface TreatmentProtocolProps {
+  steps: TreatmentProtocolStep[];
+}
+
+export default function TreatmentProtocol({ steps }: TreatmentProtocolProps) {
   const { lang } = useLanguage();
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
 
   useEffect(() => {
-    if (paused) return;
+    if (paused || steps.length === 0) return;
     const timer = setInterval(() => {
       setActive((prev) => (prev + 1) % steps.length);
     }, AUTO_ADVANCE_MS);
     return () => clearInterval(timer);
-  }, [active, paused]);
+  }, [active, paused, steps.length]);
+
+  if (steps.length === 0) return null;
 
   return (
     <section className="relative overflow-hidden px-4 py-20 sm:px-6 lg:px-8">
@@ -95,11 +61,10 @@ export default function TreatmentProtocol() {
           className="mt-14 flex flex-col gap-3 lg:flex-row lg:items-stretch"
         >
           {steps.map((step, index) => {
-            const Icon = step.icon;
             const isActive = index === active;
             return (
               <motion.button
-                key={step.title.en}
+                key={step.id}
                 type="button"
                 layout
                 onClick={() => setActive(index)}
@@ -114,13 +79,15 @@ export default function TreatmentProtocol() {
                       isActive ? "bg-brand-gradient text-white shadow-glow-brand" : "bg-brand/10 text-brand-700"
                     }`}
                   >
-                    <Icon className="h-5 w-5" strokeWidth={1.8} />
+                    <DynamicIcon tag={step.icon_tag} className="h-5 w-5" strokeWidth={1.8} />
                   </span>
                   <div className="min-w-0 flex-1">
                     <span className="font-english text-[11px] font-extrabold tracking-wide text-brand-600">
                       0{index + 1}
                     </span>
-                    <h3 className="truncate font-extrabold text-ink">{pick(lang, step.title)}</h3>
+                    <h3 className="truncate font-extrabold text-ink">
+                      {pick(lang, { ar: step.title_ar, en: step.title_en })}
+                    </h3>
                   </div>
                 </motion.div>
 
@@ -134,7 +101,7 @@ export default function TreatmentProtocol() {
                       className="overflow-hidden"
                     >
                       <p className="mt-4 text-sm leading-relaxed text-ink/60">
-                        {pick(lang, step.description)}
+                        {pick(lang, { ar: step.description_ar, en: step.description_en })}
                       </p>
                     </motion.div>
                   )}

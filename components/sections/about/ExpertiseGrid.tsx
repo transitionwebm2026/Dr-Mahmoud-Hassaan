@@ -3,44 +3,21 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, HeartPulse, Microscope, ScanSearch, Scissors } from "lucide-react";
+import { ArrowLeft, ArrowRight, ScanSearch } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { pick } from "@/lib/i18n";
+import type { SurgeryService } from "@/lib/supabase/types";
 import GlassCard from "@/components/GlassCard";
 
-const expertise = [
-  {
-    icon: HeartPulse,
-    image: "/images/surgery-breast.jpg",
-    title: { ar: "جراحة أورام الثدي", en: "Breast Oncology Surgery" },
-    description: {
-      ar: "خبرة واسعة في استئصال أورام الثدي مع الحفاظ على الشكل التجميلي للمريضة.",
-      en: "Extensive experience in breast tumor removal with cosmetic preservation.",
-    },
-  },
-  {
-    icon: Scissors,
-    image: "/images/surgery-gi.jpg",
-    title: { ar: "جراحة أورام الجهاز الهضمي", en: "GI Oncology Surgery" },
-    description: {
-      ar: "علاج جراحي دقيق لأورام المعدة والقولون والكبد بمعايير عالمية.",
-      en: "Precise surgical treatment of stomach, colon & liver tumors to global standards.",
-    },
-  },
-  {
-    icon: Microscope,
-    image: "/images/surgery-laparoscopic.jpg",
-    title: { ar: "الجراحة بالمنظار المتقدمة", en: "Advanced Laparoscopic Surgery" },
-    description: {
-      ar: "تدخلات جراحية دقيقة بالحد الأدنى من التدخل وفترة تعافٍ أسرع.",
-      en: "Precise, minimally invasive interventions with faster recovery.",
-    },
-  },
-];
+export interface ExpertiseGridProps {
+  items: SurgeryService[];
+}
 
-export default function ExpertiseGrid() {
+export default function ExpertiseGrid({ items }: ExpertiseGridProps) {
   const { lang } = useLanguage();
   const ArrowIcon = lang === "ar" ? ArrowLeft : ArrowRight;
+
+  if (items.length === 0) return null;
 
   return (
     <section className="relative px-4 py-20 sm:px-6 lg:px-8">
@@ -68,24 +45,26 @@ export default function ExpertiseGrid() {
         </motion.div>
 
         <div className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {expertise.map((item, index) => (
+          {items.map((item, index) => (
             <GlassCard
-              key={item.title.en}
+              key={item.id}
               index={index}
-              title={pick(lang, item.title)}
-              description={pick(lang, item.description)}
+              title={pick(lang, { ar: item.title_ar, en: item.title_en })}
+              description={pick(lang, { ar: item.short_description_ar, en: item.short_description_en })}
               media={
-                <Image
-                  src={item.image}
-                  alt={pick(lang, item.title)}
-                  fill
-                  sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                  className="object-cover"
-                />
+                item.image_url && (
+                  <Image
+                    src={item.image_url}
+                    alt={pick(lang, { ar: item.title_ar, en: item.title_en })}
+                    fill
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    className="object-cover"
+                  />
+                )
               }
               badge={
                 <span className="icon-chip">
-                  <item.icon className="h-5 w-5" />
+                  <ScanSearch className="h-5 w-5" />
                 </span>
               }
             />

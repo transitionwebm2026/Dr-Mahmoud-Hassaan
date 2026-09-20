@@ -4,10 +4,15 @@ import { motion } from "framer-motion";
 import { CalendarCheck } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { pick } from "@/lib/i18n";
+import type { ClinicSettings } from "@/lib/supabase/types";
 import BookingForm from "./BookingForm";
 import ClinicInfoMap from "./ClinicInfoMap";
 
-export default function ContactFormMapSection() {
+export interface ContactFormMapSectionProps {
+  clinicSettings: ClinicSettings | null;
+}
+
+export default function ContactFormMapSection({ clinicSettings }: ContactFormMapSectionProps) {
   const { lang } = useLanguage();
 
   return (
@@ -46,7 +51,7 @@ export default function ContactFormMapSection() {
               switching the language toggle to English (LTR) mirrors both
               automatically, moving the form to the left. */}
           <BookingForm />
-          <ClinicInfoMap />
+          <ClinicInfoMap settings={clinicSettings} />
         </div>
       </div>
     </section>

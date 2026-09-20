@@ -7,23 +7,17 @@ import { pick } from "@/lib/i18n";
 import { DOCTOR } from "@/lib/constants";
 import FallbackImage from "@/components/ui/FallbackImage";
 
-const messageParagraphs = [
-  {
-    ar: "أرحب بكم في هذه الصفحة لأشارككم جزءًا من رحلتي المهنية والإنسانية. منذ أن قررت دراسة الطب، كان هدفي دائمًا تقديم رعاية طبية تجمع بين الدقة العلمية والدفء الإنساني.",
-    en: "Welcome — I'd like to share part of my professional and personal journey with you. Since the day I decided to study medicine, my goal has always been to deliver care that combines scientific precision with genuine human warmth.",
-  },
-  {
-    ar: "جراحة الأورام ليست مجرد تخصص طبي بالنسبة لي، بل رسالة أؤمن بها لمساعدة كل مريض على مواجهة رحلته العلاجية بثقة وأمل، بدءًا من التشخيص الدقيق وحتى التعافي الكامل.",
-    en: "Surgical oncology isn't just a specialty to me — it's a mission I believe in: helping every patient face their treatment journey with confidence and hope, from an accurate diagnosis through full recovery.",
-  },
-  {
-    ar: "أعدكم بأن أكون بجانبكم في كل خطوة، بشرح واضح لكل قرار طبي، ومتابعة شخصية لا تنتهي عند باب غرفة العمليات.",
-    en: "I promise to stand beside you at every step — with a clear explanation behind every medical decision, and personal follow-up that doesn't end at the operating room door.",
-  },
-];
+export interface DoctorMessageProps {
+  paragraphsAr: string[];
+  paragraphsEn: string[];
+}
 
-export default function DoctorMessage() {
+export default function DoctorMessage({ paragraphsAr, paragraphsEn }: DoctorMessageProps) {
   const { lang } = useLanguage();
+  const messageParagraphs =
+    paragraphsAr.length === paragraphsEn.length && paragraphsAr.length > 0
+      ? paragraphsAr.map((ar, i) => ({ ar, en: paragraphsEn[i] }))
+      : [];
 
   return (
     <section className="relative px-4 py-20 sm:px-6 lg:px-8">

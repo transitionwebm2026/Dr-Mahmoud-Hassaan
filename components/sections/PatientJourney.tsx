@@ -2,64 +2,21 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  ClipboardList,
-  HeartPulse,
-  ListChecks,
-  Map,
-  ScanSearch,
-  Scissors,
-  type LucideIcon,
-} from "lucide-react";
+import { Map } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
-import { pick, type Bilingual } from "@/lib/i18n";
+import { pick } from "@/lib/i18n";
+import { DynamicIcon } from "@/lib/icon-registry";
+import type { PatientJourneyStep } from "@/lib/supabase/types";
 
-const steps: { icon: LucideIcon; title: Bilingual; description: Bilingual }[] = [
-  {
-    icon: ClipboardList,
-    title: { ar: "الاستشارة الأولى", en: "Initial Consultation" },
-    description: {
-      ar: "جلسة تعارف شاملة لمناقشة الأعراض والتاريخ المرضي وتحديد الخطوات التالية.",
-      en: "A thorough first session to discuss symptoms, history, and outline next steps.",
-    },
-  },
-  {
-    icon: ScanSearch,
-    title: { ar: "التقييم والفحوصات", en: "Assessment & Diagnostics" },
-    description: {
-      ar: "إجراء الفحوصات والتحاليل والأشعة اللازمة لتحديد طبيعة الحالة بدقة.",
-      en: "Running the imaging and lab work needed to precisely define the case.",
-    },
-  },
-  {
-    icon: ListChecks,
-    title: { ar: "التخطيط الجراحي", en: "Surgical Planning" },
-    description: {
-      ar: "وضع خطة علاجية مخصصة بالتنسيق مع فريق متعدد التخصصات.",
-      en: "Building a tailored treatment plan in coordination with a multidisciplinary team.",
-    },
-  },
-  {
-    icon: Scissors,
-    title: { ar: "التدخل الجراحي", en: "The Surgery" },
-    description: {
-      ar: "تنفيذ العملية بأحدث التقنيات وأعلى معايير السلامة داخل غرف عمليات مجهزة.",
-      en: "Performing the procedure with the latest techniques in fully equipped operating rooms.",
-    },
-  },
-  {
-    icon: HeartPulse,
-    title: { ar: "المتابعة والتعافي", en: "Follow-up & Recovery" },
-    description: {
-      ar: "برنامج متابعة دوري لضمان تعافٍ آمن وسريع بعد الجراحة.",
-      en: "A regular follow-up program to ensure a safe, swift recovery after surgery.",
-    },
-  },
-];
+export interface PatientJourneyProps {
+  steps: PatientJourneyStep[];
+}
 
-export default function PatientJourney() {
+export default function PatientJourney({ steps }: PatientJourneyProps) {
   const { lang } = useLanguage();
   const [active, setActive] = useState(0);
+
+  if (steps.length === 0) return null;
 
   return (
     <section className="relative px-4 py-20 sm:px-6 lg:px-8">
@@ -101,10 +58,9 @@ export default function PatientJourney() {
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-5 lg:gap-4">
             {steps.map((step, i) => {
               const isActive = i === active;
-              const Icon = step.icon;
               return (
                 <motion.button
-                  key={step.title.en}
+                  key={step.id}
                   type="button"
                   onClick={() => setActive(i)}
                   initial={{ opacity: 0, y: 24 }}
@@ -121,7 +77,7 @@ export default function PatientJourney() {
                         : "border-brand/20 bg-white/70 text-brand-600 backdrop-blur-md"
                     }`}
                   >
-                    <Icon className="h-6 w-6" strokeWidth={1.8} />
+                    <DynamicIcon tag={step.icon_url} className="h-6 w-6" strokeWidth={1.8} />
                     <span
                       className={`absolute -top-2 -end-2 flex h-6 w-6 items-center justify-center rounded-full font-english text-[11px] font-extrabold ${
                         isActive ? "bg-deep-800 text-white" : "bg-brand/10 text-brand-700"
@@ -131,7 +87,7 @@ export default function PatientJourney() {
                     </span>
                   </span>
                   <p className={`text-sm font-bold transition-colors ${isActive ? "text-brand-700" : "text-ink/60"}`}>
-                    {pick(lang, step.title)}
+                    {pick(lang, { ar: step.title_ar, en: step.title_en })}
                   </p>
                 </motion.button>
               );
@@ -150,9 +106,11 @@ export default function PatientJourney() {
               transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
               className="glass-panel mx-auto max-w-2xl !border-brand/20 !bg-white/60 p-6 text-center"
             >
-              <h3 className="font-extrabold text-ink">{pick(lang, steps[active].title)}</h3>
+              <h3 className="font-extrabold text-ink">
+                {pick(lang, { ar: steps[active].title_ar, en: steps[active].title_en })}
+              </h3>
               <p className="mt-2 text-sm leading-relaxed text-ink/65">
-                {pick(lang, steps[active].description)}
+                {pick(lang, { ar: steps[active].description_ar, en: steps[active].description_en })}
               </p>
             </motion.div>
           </AnimatePresence>

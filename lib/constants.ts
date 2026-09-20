@@ -14,12 +14,6 @@ export const DOCTOR = {
 };
 
 /**
- * Placeholder production domain — used as `metadataBase` for SEO/Open
- * Graph URLs. Replace with the real domain once one is registered.
- */
-export const SITE_URL = "https://dr-mahmoudhassan.com";
-
-/**
  * Placeholder contact details — replace with the real practice numbers
  * and social handles before going live.
  */

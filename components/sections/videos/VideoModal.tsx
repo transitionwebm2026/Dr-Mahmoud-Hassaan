@@ -5,17 +5,11 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { Pause, Play, X } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
-import { pick, type Bilingual } from "@/lib/i18n";
-
-export interface VideoEntry {
-  title: Bilingual;
-  description: Bilingual;
-  duration: string;
-  thumbnail: string;
-}
+import { pick } from "@/lib/i18n";
+import type { Video } from "@/lib/supabase/types";
 
 interface VideoModalProps {
-  video: VideoEntry;
+  video: Video;
   onClose: () => void;
 }
 
@@ -46,7 +40,7 @@ export default function VideoModal({ video, onClose }: VideoModalProps) {
       className="fixed inset-0 z-[100] flex items-center justify-center bg-deep-950/80 p-4 backdrop-blur-md"
       role="dialog"
       aria-modal="true"
-      aria-label={pick(lang, video.title)}
+      aria-label={pick(lang, { ar: video.title_ar, en: video.title_en })}
     >
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 24 }}
@@ -66,13 +60,15 @@ export default function VideoModal({ video, onClose }: VideoModalProps) {
         </button>
 
         <div className="relative aspect-[9/16] w-full">
-          <Image
-            src={video.thumbnail}
-            alt={pick(lang, video.title)}
-            fill
-            sizes="400px"
-            className="object-cover"
-          />
+          {video.thumbnail_url && (
+            <Image
+              src={video.thumbnail_url}
+              alt={pick(lang, { ar: video.title_ar, en: video.title_en })}
+              fill
+              sizes="400px"
+              className="object-cover"
+            />
+          )}
           <div className="absolute inset-0 bg-deep-950/30" />
           <button
             type="button"
@@ -94,8 +90,10 @@ export default function VideoModal({ video, onClose }: VideoModalProps) {
         </div>
 
         <div className="p-6">
-          <h3 className="text-lg font-extrabold text-ink">{pick(lang, video.title)}</h3>
-          <p className="mt-2 text-sm leading-relaxed text-ink/65">{pick(lang, video.description)}</p>
+          <h3 className="text-lg font-extrabold text-ink">{pick(lang, { ar: video.title_ar, en: video.title_en })}</h3>
+          <p className="mt-2 text-sm leading-relaxed text-ink/65">
+            {pick(lang, { ar: video.description_ar, en: video.description_en })}
+          </p>
         </div>
       </motion.div>
     </motion.div>

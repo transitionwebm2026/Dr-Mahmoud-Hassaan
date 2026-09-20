@@ -16,6 +16,7 @@ import { pick, type Bilingual } from "@/lib/i18n";
 import { CONTACT } from "@/lib/constants";
 import { useTilt3D } from "@/lib/useTilt3D";
 import { useIsMobile } from "@/lib/useIsMobile";
+import { createClient } from "@/lib/supabase/client";
 import { WhatsAppIcon } from "@/components/ui/SocialIcons";
 
 const SERVICES: { value: string; label: Bilingual }[] = [
@@ -117,6 +118,22 @@ export default function BookingForm() {
     const message = lines.filter((line): line is string => line !== null).join("\n");
     window.open(`${CONTACT.whatsappHref}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
     setSent(true);
+
+    // Also record the request for the clinic's admin dashboard. Fire-and-forget:
+    // WhatsApp is the primary channel the patient actually sees, so a Supabase
+    // hiccup here shouldn't block or alarm them — only surface it to developers.
+    createClient()
+      .from("contact_appointments")
+      .insert({
+        name,
+        phone,
+        preferred_date: date || null,
+        specialty: serviceLabel ? pick(lang, serviceLabel) : null,
+        notes: notes || null,
+      })
+      .then(({ error }) => {
+        if (error) console.error("Failed to record consultation request:", error.message);
+      });
   }
 
   return (

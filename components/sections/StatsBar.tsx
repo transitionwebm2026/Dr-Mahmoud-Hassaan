@@ -6,29 +6,39 @@ import { useLanguage } from "@/context/LanguageContext";
 import { pick } from "@/lib/i18n";
 import AnimatedCounter from "../ui/AnimatedCounter";
 
-const stats = [
-  {
-    icon: HeartPulse,
-    value: 3000,
-    suffix: "+",
-    label: { ar: "مريض تم علاجه", en: "Patients Cured" },
-  },
-  {
-    icon: Activity,
-    value: 5000,
-    suffix: "+",
-    label: { ar: "عملية جراحية ناجحة", en: "Successful Surgeries" },
-  },
-  {
-    icon: Stethoscope,
-    value: 15,
-    suffix: "+",
-    label: { ar: "سنة خبرة", en: "Years of Experience" },
-  },
-];
+export interface StatsBarProps {
+  curedPatients?: number;
+  successfulOperations?: number;
+  yearsExperience?: number;
+}
 
-export default function StatsBar() {
+export default function StatsBar({
+  curedPatients = 3000,
+  successfulOperations = 5000,
+  yearsExperience = 15,
+}: StatsBarProps) {
   const { lang } = useLanguage();
+
+  const stats = [
+    {
+      icon: HeartPulse,
+      value: curedPatients,
+      suffix: "+",
+      label: { ar: "مريض تم علاجه", en: "Patients Cured" },
+    },
+    {
+      icon: Activity,
+      value: successfulOperations,
+      suffix: "+",
+      label: { ar: "عملية جراحية ناجحة", en: "Successful Surgeries" },
+    },
+    {
+      icon: Stethoscope,
+      value: yearsExperience,
+      suffix: "+",
+      label: { ar: "سنة خبرة", en: "Years of Experience" },
+    },
+  ];
 
   return (
     <section className="relative px-4 py-6 sm:px-6 lg:px-8">

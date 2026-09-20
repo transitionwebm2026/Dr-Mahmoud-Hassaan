@@ -5,59 +5,16 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, MessageSquareQuote, Quote, Star } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
-import { pick, type Bilingual } from "@/lib/i18n";
-
-const reviews: { name: Bilingual; procedure: Bilingual; quote: Bilingual; rating: number }[] = [
-  {
-    name: { ar: "أم أحمد", en: "Um Ahmed" },
-    procedure: { ar: "جراحة أورام الثدي", en: "Breast Cancer Surgery" },
-    quote: {
-      ar: "الدكتور محمود حسان غيّر حياتي، تعامل إنساني ودقة جراحية عالية من أول لحظة.",
-      en: "Dr. Mahmoud Hassan changed my life — a compassionate approach and outstanding surgical precision from day one.",
-    },
-    rating: 5,
-  },
-  {
-    name: { ar: "كريم السيد", en: "Kareem El-Sayed" },
-    procedure: { ar: "جراحة أورام القولون", en: "Colon Oncology Surgery" },
-    quote: {
-      ar: "متابعة مستمرة وشرح واضح لكل خطوة في رحلة العلاج، شكرًا دكتور.",
-      en: "Continuous follow-up and clear explanations at every step of my treatment journey. Thank you, Doctor.",
-    },
-    rating: 5,
-  },
-  {
-    name: { ar: "منى عبد الله", en: "Mona Abdallah" },
-    procedure: { ar: "جراحة بالمنظار", en: "Laparoscopic Surgery" },
-    quote: {
-      ar: "فريق طبي محترف وجراحة ناجحة بفضل الله وجهد الدكتور محمود وفريقه.",
-      en: "A professional medical team and a successful surgery, thanks to Dr. Mahmoud and his team's dedication.",
-    },
-    rating: 5,
-  },
-  {
-    name: { ar: "أحمد فتحي", en: "Ahmed Fathy" },
-    procedure: { ar: "استشارة وتخطيط جراحي", en: "Consultation & Surgical Planning" },
-    quote: {
-      ar: "أنصح بشدة بالدكتور محمود حسان لخبرته الكبيرة وحرصه الدائم على راحة المريض.",
-      en: "I highly recommend Dr. Mahmoud Hassan for his deep expertise and genuine care for patient comfort.",
-    },
-    rating: 5,
-  },
-  {
-    name: { ar: "سارة يوسف", en: "Sara Youssef" },
-    procedure: { ar: "متابعة ما بعد الجراحة", en: "Post-Surgical Follow-up" },
-    quote: {
-      ar: "تجربة علاجية مطمئنة تمامًا من أول استشارة وحتى التعافي الكامل.",
-      en: "A completely reassuring treatment experience, from the first consultation to full recovery.",
-    },
-    rating: 5,
-  },
-];
+import { pick } from "@/lib/i18n";
+import type { Review } from "@/lib/supabase/types";
 
 const AUTO_SCROLL_MS = 3800;
 
-export default function ReviewsSlider() {
+export interface ReviewsSliderProps {
+  reviews: Review[];
+}
+
+export default function ReviewsSlider({ reviews }: ReviewsSliderProps) {
   const { lang } = useLanguage();
   const trackRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
@@ -94,6 +51,8 @@ export default function ReviewsSlider() {
     return () => clearInterval(timer);
   }, [isPaused, scrollByCard]);
 
+  if (reviews.length === 0) return null;
+
   return (
     <section className="relative px-4 py-20 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
@@ -124,7 +83,7 @@ export default function ReviewsSlider() {
           >
             {reviews.map((review, i) => (
               <motion.div
-                key={review.name.en}
+                key={review.id}
                 data-review-card
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -134,7 +93,7 @@ export default function ReviewsSlider() {
               >
                 <Quote className="h-8 w-8 text-brand/30" />
                 <p className="mt-3 min-h-[80px] text-sm leading-relaxed text-ink/75">
-                  {pick(lang, review.quote)}
+                  {pick(lang, { ar: review.review_text_ar, en: review.review_text_en })}
                 </p>
                 <div className="mt-4 flex items-center gap-1">
                   {Array.from({ length: review.rating }).map((_, starIdx) => (
@@ -143,11 +102,13 @@ export default function ReviewsSlider() {
                 </div>
                 <div className="mt-4 flex items-center gap-3 border-t border-brand/10 pt-4">
                   <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-gradient font-english text-sm font-extrabold text-white">
-                    {pick(lang, review.name).charAt(0)}
+                    {review.patient_name.charAt(0)}
                   </span>
                   <div>
-                    <p className="text-sm font-extrabold text-ink">{pick(lang, review.name)}</p>
-                    <p className="text-xs text-ink/50">{pick(lang, review.procedure)}</p>
+                    <p className="text-sm font-extrabold text-ink">{review.patient_name}</p>
+                    <p className="text-xs text-ink/50">
+                      {pick(lang, { ar: review.surgical_procedure_ar, en: review.surgical_procedure_en })}
+                    </p>
                   </div>
                 </div>
               </motion.div>

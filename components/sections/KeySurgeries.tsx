@@ -3,44 +3,21 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, HeartPulse, Microscope, Scissors } from "lucide-react";
+import { ArrowLeft, ArrowRight, Scissors } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { pick } from "@/lib/i18n";
+import type { SurgeryService } from "@/lib/supabase/types";
 import GlassCard from "../GlassCard";
 
-const surgeries = [
-  {
-    icon: HeartPulse,
-    image: "/images/surgery-breast.jpg",
-    title: { ar: "جراحة أورام الثدي", en: "Breast Cancer Surgery" },
-    description: {
-      ar: "استئصال الأورام مع الحفاظ على الشكل التجميلي، باستخدام أحدث بروتوكولات الجراحة الآمنة.",
-      en: "Tumor removal with cosmetic preservation, using the latest safe surgical protocols.",
-    },
-  },
-  {
-    icon: Scissors,
-    image: "/images/surgery-gi.jpg",
-    title: { ar: "جراحة أورام الجهاز الهضمي", en: "GI Oncology Surgery" },
-    description: {
-      ar: "علاج جراحي دقيق لأورام المعدة والقولون والكبد بمعايير عالمية للسلامة.",
-      en: "Precise surgical treatment of stomach, colon & liver tumors to global safety standards.",
-    },
-  },
-  {
-    icon: Microscope,
-    image: "/images/surgery-laparoscopic.jpg",
-    title: { ar: "الجراحة بالمنظار للأورام", en: "Laparoscopic Oncology Surgery" },
-    description: {
-      ar: "تدخل جراحي أقل ألمًا وفترة تعافٍ أسرع باستخدام تقنيات المنظار المتقدمة.",
-      en: "Less painful intervention and faster recovery using advanced laparoscopic techniques.",
-    },
-  },
-];
+export interface KeySurgeriesProps {
+  items: SurgeryService[];
+}
 
-export default function KeySurgeries() {
+export default function KeySurgeries({ items }: KeySurgeriesProps) {
   const { lang } = useLanguage();
   const ArrowIcon = lang === "ar" ? ArrowLeft : ArrowRight;
+
+  if (items.length === 0) return null;
 
   return (
     <section className="relative px-4 py-20 sm:px-6 lg:px-8">
@@ -68,24 +45,26 @@ export default function KeySurgeries() {
         </motion.div>
 
         <div className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {surgeries.map((item, index) => (
+          {items.map((item, index) => (
             <GlassCard
-              key={item.title.en}
+              key={item.id}
               index={index}
-              title={pick(lang, item.title)}
-              description={pick(lang, item.description)}
+              title={pick(lang, { ar: item.title_ar, en: item.title_en })}
+              description={pick(lang, { ar: item.short_description_ar, en: item.short_description_en })}
               media={
-                <Image
-                  src={item.image}
-                  alt={pick(lang, item.title)}
-                  fill
-                  sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                  className="object-cover"
-                />
+                item.image_url && (
+                  <Image
+                    src={item.image_url}
+                    alt={pick(lang, { ar: item.title_ar, en: item.title_en })}
+                    fill
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    className="object-cover"
+                  />
+                )
               }
               badge={
                 <span className="icon-chip">
-                  <item.icon className="h-5 w-5" />
+                  <Scissors className="h-5 w-5" />
                 </span>
               }
             />
