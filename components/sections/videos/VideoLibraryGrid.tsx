@@ -11,7 +11,7 @@ import type { Video } from "@/lib/supabase/types";
 
 // Only needed once a card is clicked, so it's split into its own chunk
 // instead of shipping in the initial page bundle for every visitor.
-const VideoModal = dynamic(() => import("./VideoModal"), { ssr: false });
+const VideoPopup = dynamic(() => import("@/components/VideoPopup"), { ssr: false });
 
 export interface VideoLibraryGridProps {
   videos: Video[];
@@ -94,7 +94,13 @@ export default function VideoLibraryGrid({ videos }: VideoLibraryGridProps) {
 
       <AnimatePresence>
         {selected !== null && (
-          <VideoModal video={videos[selected]} onClose={() => setSelected(null)} />
+          <VideoPopup
+            src={videos[selected].video_url}
+            poster={videos[selected].thumbnail_url}
+            title={pick(lang, { ar: videos[selected].title_ar, en: videos[selected].title_en })}
+            description={pick(lang, { ar: videos[selected].description_ar, en: videos[selected].description_en })}
+            onClose={() => setSelected(null)}
+          />
         )}
       </AnimatePresence>
     </section>

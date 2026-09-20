@@ -6,13 +6,15 @@ import { useLanguage } from "@/context/LanguageContext";
 import { pick } from "@/lib/i18n";
 import { DOCTOR } from "@/lib/constants";
 import FallbackImage from "@/components/ui/FallbackImage";
+import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
 
 export interface DoctorMessageProps {
   paragraphsAr: string[];
   paragraphsEn: string[];
+  imageSrc?: string | null;
 }
 
-export default function DoctorMessage({ paragraphsAr, paragraphsEn }: DoctorMessageProps) {
+export default function DoctorMessage({ paragraphsAr, paragraphsEn, imageSrc }: DoctorMessageProps) {
   const { lang } = useLanguage();
   const messageParagraphs =
     paragraphsAr.length === paragraphsEn.length && paragraphsAr.length > 0
@@ -31,14 +33,18 @@ export default function DoctorMessage({ paragraphsAr, paragraphsEn }: DoctorMess
           className="relative mx-auto w-full max-w-sm lg:max-w-none"
         >
           <div className="glass-card relative aspect-[4/5] w-full overflow-hidden !rounded-4xl">
-            <FallbackImage
-              src="/images/about-doctor.jpg"
-              alt={pick(lang, DOCTOR.name)}
-              placeholderIcon={UserRound}
-              placeholderVariant="deep"
-              placeholderSize="lg"
-              placeholderLabel={pick(lang, DOCTOR.name)}
-            />
+            {imageSrc ? (
+              <FallbackImage
+                src={imageSrc}
+                alt={pick(lang, DOCTOR.name)}
+                placeholderIcon={UserRound}
+                placeholderVariant="deep"
+                placeholderSize="lg"
+                placeholderLabel={pick(lang, DOCTOR.name)}
+              />
+            ) : (
+              <ImagePlaceholder icon={UserRound} variant="deep" size="lg" label={pick(lang, DOCTOR.name)} />
+            )}
           </div>
           <div className="pointer-events-none absolute -bottom-6 -start-6 -z-10 h-32 w-32 rounded-full bg-brand/20 blur-2xl" />
           <div className="pointer-events-none absolute -top-6 -end-6 -z-10 h-32 w-32 rounded-full bg-deep/20 blur-2xl" />

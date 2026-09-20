@@ -29,6 +29,8 @@ export interface DoctorProfile {
   /** About page "message from the doctor" — paragraphs separated by a blank line. */
   message_ar: string;
   message_en: string;
+  /** Photo for the About page "Message From the Doctor" card — distinct from main_image_url (Hero background). */
+  message_image_url: string | null;
   /** Home page intro-video highlight bullets — one per line. */
   intro_highlights_ar: string;
   intro_highlights_en: string;

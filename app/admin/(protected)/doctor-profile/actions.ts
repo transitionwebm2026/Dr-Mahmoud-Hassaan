@@ -21,6 +21,7 @@ export async function saveDoctorProfile(
     bio_en: String(formData.get("bio_en") ?? "").trim(),
     message_ar: String(formData.get("message_ar") ?? "").trim(),
     message_en: String(formData.get("message_en") ?? "").trim(),
+    message_image_url: String(formData.get("message_image_url") ?? "").trim() || null,
     years_experience: Number(formData.get("years_experience") ?? 0),
     successful_operations: Number(formData.get("successful_operations") ?? 0),
     cured_patients: Number(formData.get("cured_patients") ?? 0),

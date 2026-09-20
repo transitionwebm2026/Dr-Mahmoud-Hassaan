@@ -73,7 +73,11 @@ export default async function HomePage() {
         yearsExperience={profile?.years_experience}
       />
 
-      <DoctorIntroVideo highlightsAr={splitLines(profile?.intro_highlights_ar)} highlightsEn={splitLines(profile?.intro_highlights_en)} />
+      <DoctorIntroVideo
+        highlightsAr={splitLines(profile?.intro_highlights_ar)}
+        highlightsEn={splitLines(profile?.intro_highlights_en)}
+        videoUrl={profile?.intro_video_url}
+      />
 
       <KeySurgeries items={surgeriesRes.data ?? []} />
 

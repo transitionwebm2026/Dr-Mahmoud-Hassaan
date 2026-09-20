@@ -1,12 +1,18 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import dynamic from "next/dynamic";
+import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Clapperboard, Play } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { pick } from "@/lib/i18n";
 import type { Video } from "@/lib/supabase/types";
+
+// Only needed once a card is clicked, so it's split into its own chunk
+// instead of shipping in the initial page bundle for every visitor.
+const VideoPopup = dynamic(() => import("@/components/VideoPopup"), { ssr: false });
 
 export interface FeaturedVideosProps {
   videos: Video[];
@@ -15,6 +21,7 @@ export interface FeaturedVideosProps {
 export default function FeaturedVideos({ videos }: FeaturedVideosProps) {
   const { lang } = useLanguage();
   const ArrowIcon = lang === "ar" ? ArrowLeft : ArrowRight;
+  const [selected, setSelected] = useState<number | null>(null);
 
   if (videos.length === 0) return null;
 
@@ -39,14 +46,16 @@ export default function FeaturedVideos({ videos }: FeaturedVideosProps) {
 
         <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3">
           {videos.map((video, index) => (
-            <motion.div
+            <motion.button
               key={video.id}
+              type="button"
+              onClick={() => setSelected(index)}
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.6, delay: index * 0.12, ease: [0.22, 1, 0.36, 1] }}
               whileHover={{ y: -8 }}
-              className="glass-card group cursor-pointer overflow-hidden"
+              className="glass-card group cursor-pointer overflow-hidden text-start"
             >
               <div className="relative aspect-[4/5] w-full">
                 {video.thumbnail_url && (
@@ -70,7 +79,7 @@ export default function FeaturedVideos({ videos }: FeaturedVideosProps) {
               <div className="p-4">
                 <p className="text-sm font-bold text-ink">{pick(lang, { ar: video.title_ar, en: video.title_en })}</p>
               </div>
-            </motion.div>
+            </motion.button>
           ))}
         </div>
 
@@ -81,6 +90,17 @@ export default function FeaturedVideos({ videos }: FeaturedVideosProps) {
           </Link>
         </div>
       </div>
+
+      <AnimatePresence>
+        {selected !== null && (
+          <VideoPopup
+            src={videos[selected].video_url}
+            poster={videos[selected].thumbnail_url}
+            title={pick(lang, { ar: videos[selected].title_ar, en: videos[selected].title_en })}
+            onClose={() => setSelected(null)}
+          />
+        )}
+      </AnimatePresence>
     </section>
   );
 }

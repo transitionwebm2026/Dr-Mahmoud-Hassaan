@@ -2,11 +2,16 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
-import { Pause, Play, ShieldCheck, Sparkles } from "lucide-react";
+import dynamic from "next/dynamic";
+import { AnimatePresence, motion } from "framer-motion";
+import { Play, ShieldCheck, Sparkles } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { pick } from "@/lib/i18n";
 import { DOCTOR } from "@/lib/constants";
+
+// Only needed once the poster is clicked, so it's split into its own chunk
+// instead of shipping in the initial page bundle for every visitor.
+const VideoPopup = dynamic(() => import("@/components/VideoPopup"), { ssr: false });
 
 const DEFAULT_HIGHLIGHTS_AR = [
   "أكثر من 15 عامًا من الخبرة في جراحة الأورام",
@@ -23,14 +28,16 @@ const DEFAULT_HIGHLIGHTS_EN = [
 export interface DoctorIntroVideoProps {
   highlightsAr?: string[];
   highlightsEn?: string[];
+  videoUrl?: string | null;
 }
 
 export default function DoctorIntroVideo({
   highlightsAr = DEFAULT_HIGHLIGHTS_AR,
   highlightsEn = DEFAULT_HIGHLIGHTS_EN,
+  videoUrl,
 }: DoctorIntroVideoProps) {
   const { lang } = useLanguage();
-  const [playing, setPlaying] = useState(false);
+  const [open, setOpen] = useState(false);
   const highlights = (highlightsAr.length === highlightsEn.length ? highlightsAr : DEFAULT_HIGHLIGHTS_AR).map(
     (ar, i) => ({ ar, en: (highlightsEn.length === highlightsAr.length ? highlightsEn : DEFAULT_HIGHLIGHTS_EN)[i] })
   );
@@ -91,26 +98,38 @@ export default function DoctorIntroVideo({
                 className="object-cover"
                 priority
               />
-              <button
-                type="button"
-                onClick={() => setPlaying((v) => !v)}
-                aria-label={playing ? "Pause video" : "Play video"}
-                className="group absolute inset-0 flex items-center justify-center bg-deep-950/35 transition-colors hover:bg-deep-950/45"
-              >
-                <span className="flex h-20 w-20 items-center justify-center rounded-full border border-white/40 bg-white/20 backdrop-blur-lg shadow-glow-brand transition-transform duration-300 group-hover:scale-110">
-                  {playing ? (
-                    <Pause className="h-8 w-8 text-white" fill="white" />
-                  ) : (
+              {videoUrl && (
+                <button
+                  type="button"
+                  onClick={() => setOpen(true)}
+                  aria-label={pick(lang, { ar: "تشغيل الفيديو", en: "Play video" })}
+                  className="group absolute inset-0 flex items-center justify-center bg-deep-950/35 transition-colors hover:bg-deep-950/45"
+                >
+                  <span className="flex h-20 w-20 items-center justify-center rounded-full border border-white/40 bg-white/20 backdrop-blur-lg shadow-glow-brand transition-transform duration-300 group-hover:scale-110">
                     <Play className="ms-1 h-8 w-8 text-white" fill="white" />
-                  )}
-                </span>
-              </button>
+                  </span>
+                </button>
+              )}
             </div>
           </div>
           <div className="pointer-events-none absolute -bottom-6 -start-6 -z-10 h-32 w-32 rounded-full bg-brand/20 blur-2xl" />
           <div className="pointer-events-none absolute -top-6 -end-6 -z-10 h-32 w-32 rounded-full bg-deep/20 blur-2xl" />
         </motion.div>
       </div>
+
+      <AnimatePresence>
+        {open && videoUrl && (
+          <VideoPopup
+            src={videoUrl}
+            poster="/images/video-poster.jpg"
+            title={pick(lang, {
+              ar: `رسالة تعريفية من ${DOCTOR.name.ar}`,
+              en: `An introduction from ${DOCTOR.name.en}`,
+            })}
+            onClose={() => setOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </section>
   );
 }

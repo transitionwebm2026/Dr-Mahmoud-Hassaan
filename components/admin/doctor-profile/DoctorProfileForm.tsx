@@ -77,6 +77,14 @@ export default function DoctorProfileForm({ profile }: { profile: DoctorProfile 
             defaultValue={profile?.message_en}
           />
         </div>
+        <div className="sm:col-span-2">
+          <MediaUploadField
+            name="message_image_url"
+            label="About Page — Message From the Doctor Photo"
+            kind="image"
+            defaultValue={profile?.message_image_url}
+          />
+        </div>
 
         <div>
           <FieldLabel htmlFor="years_experience">Years of Experience</FieldLabel>
@@ -97,7 +105,12 @@ export default function DoctorProfileForm({ profile }: { profile: DoctorProfile 
         </div>
 
         <div className="sm:col-span-2">
-          <MediaUploadField name="main_image_url" label="Main Photo" kind="image" defaultValue={profile?.main_image_url} />
+          <MediaUploadField
+            name="main_image_url"
+            label="Hero Background Photo (Home & About pages)"
+            kind="image"
+            defaultValue={profile?.main_image_url}
+          />
         </div>
       </div>
 

@@ -63,11 +63,15 @@ export default async function AboutPage() {
         }}
       />
 
-      <DoctorMessage paragraphsAr={splitParagraphs(profile?.message_ar)} paragraphsEn={splitParagraphs(profile?.message_en)} />
+      <DoctorMessage
+        paragraphsAr={splitParagraphs(profile?.message_ar)}
+        paragraphsEn={splitParagraphs(profile?.message_en)}
+        imageSrc={profile?.message_image_url}
+      />
 
       <CareerTimeline milestones={milestonesRes.data ?? []} />
 
-      <AboutVideo />
+      <AboutVideo videoUrl={profile?.intro_video_url} />
 
       <ExpertiseGrid items={expertiseRes.data ?? []} />
 
