@@ -18,8 +18,9 @@ export const revalidate = 60;
 export default async function VideosPage() {
   const supabase = await createClient();
 
-  const [heroRes, videosRes] = await Promise.all([
+  const [heroRes, settingsRes, videosRes] = await Promise.all([
     supabase.from("pages_hero").select("*").eq("page_slug", "videos").maybeSingle(),
+    supabase.from("clinic_settings").select("*").limit(1).maybeSingle(),
     supabase.from("videos").select("*").eq("is_published", true).order("order_index"),
   ]);
 
@@ -53,6 +54,7 @@ export default async function VideosPage() {
           href: hero?.cta_secondary_link || CONTACT.phoneHref,
           icon: "phone",
         }}
+        settings={settingsRes.data}
       />
 
       <VideoLibraryGrid videos={videosRes.data ?? []} />

@@ -15,9 +15,6 @@ export async function saveClinicSettings(
   const payload = {
     address_ar: String(formData.get("address_ar") ?? "").trim(),
     address_en: String(formData.get("address_en") ?? "").trim(),
-    phone_primary: field("phone_primary"),
-    phone_secondary: field("phone_secondary"),
-    emergency_line: field("emergency_line"),
     working_hours_ar: field("working_hours_ar"),
     working_hours_en: field("working_hours_en"),
     map_embed_url: field("map_embed_url"),
@@ -25,6 +22,7 @@ export async function saveClinicSettings(
     instagram_url: field("instagram_url"),
     tiktok_url: field("tiktok_url"),
     whatsapp_number: field("whatsapp_number"),
+    email: field("email"),
   };
 
   const supabase = await createClient();
@@ -34,8 +32,9 @@ export async function saveClinicSettings(
 
   if (error) return { error: error.message };
 
+  // clinic_settings now also feeds the Navbar/Footer rendered on every
+  // public page (not just Contact), so every page needs revalidating.
   revalidatePath("/admin/pages/contact");
-  revalidatePath("/");
-  revalidatePath("/contact");
+  revalidatePath("/", "layout");
   return undefined;
 }

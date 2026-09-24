@@ -54,20 +54,10 @@ export default function ClinicSettingsForm({ settings }: { settings: ClinicSetti
       </div>
 
       <div className="glass-card space-y-4 p-6">
-        <h3 className="text-base font-extrabold text-ink">Phone Numbers</h3>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div>
-            <FieldLabel htmlFor="phone_primary">Primary Phone</FieldLabel>
-            <TextInput id="phone_primary" name="phone_primary" type="tel" defaultValue={settings?.phone_primary ?? ""} />
-          </div>
-          <div>
-            <FieldLabel htmlFor="phone_secondary">Secondary Phone</FieldLabel>
-            <TextInput id="phone_secondary" name="phone_secondary" type="tel" defaultValue={settings?.phone_secondary ?? ""} />
-          </div>
-          <div>
-            <FieldLabel htmlFor="emergency_line">Emergency Line</FieldLabel>
-            <TextInput id="emergency_line" name="emergency_line" type="tel" defaultValue={settings?.emergency_line ?? ""} />
-          </div>
+        <h3 className="text-base font-extrabold text-ink">Email</h3>
+        <div>
+          <FieldLabel htmlFor="email">Contact Email</FieldLabel>
+          <TextInput id="email" name="email" type="email" defaultValue={settings?.email ?? ""} />
         </div>
       </div>
 

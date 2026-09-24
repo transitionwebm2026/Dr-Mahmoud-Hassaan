@@ -205,6 +205,14 @@ export interface ContactAppointment {
   updated_at: string;
 }
 
+/** One entry in an admin-editable link list (navbar links, footer columns). */
+export interface SiteLinkItem {
+  label_ar: string;
+  label_en: string;
+  href: string;
+  visible: boolean;
+}
+
 export interface ClinicSettings {
   id: string;
   address_ar: string;
@@ -219,6 +227,33 @@ export interface ClinicSettings {
   instagram_url: string | null;
   tiktok_url: string | null;
   whatsapp_number: string | null;
+  email: string | null;
+  navbar_cta_text_ar: string | null;
+  navbar_cta_text_en: string | null;
+  navbar_cta_link: string | null;
+  footer_tagline_ar: string | null;
+  footer_tagline_en: string | null;
+  footer_disclaimer_ar: string | null;
+  footer_disclaimer_en: string | null;
+  footer_quicklinks_title_ar: string | null;
+  footer_quicklinks_title_en: string | null;
+  footer_services_title_ar: string | null;
+  footer_services_title_en: string | null;
+  footer_contact_title_ar: string | null;
+  footer_contact_title_en: string | null;
+  brand_name_ar: string | null;
+  brand_name_en: string | null;
+  brand_subtitle_ar: string | null;
+  brand_subtitle_en: string | null;
+  logo_url: string | null;
+  navbar_links: SiteLinkItem[] | null;
+  navbar_cta_visible: boolean;
+  navbar_show_phone: boolean;
+  footer_quicklinks: SiteLinkItem[] | null;
+  footer_services: SiteLinkItem[] | null;
+  footer_copyright_ar: string | null;
+  footer_copyright_en: string | null;
+  footer_show_social: boolean;
   created_at: string;
   updated_at: string;
 }

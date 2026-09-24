@@ -22,8 +22,9 @@ export const revalidate = 60;
 export default async function ServicesPage() {
   const supabase = await createClient();
 
-  const [heroRes, surgeriesRes, protocolRes, categoriesRes, itemsRes, faqsRes] = await Promise.all([
+  const [heroRes, settingsRes, surgeriesRes, protocolRes, categoriesRes, itemsRes, faqsRes] = await Promise.all([
     supabase.from("pages_hero").select("*").eq("page_slug", "services").maybeSingle(),
+    supabase.from("clinic_settings").select("*").limit(1).maybeSingle(),
     supabase.from("surgeries_services").select("*").eq("is_published", true).order("order_index"),
     supabase.from("treatment_protocol_steps").select("*").order("order_index"),
     supabase.from("procedure_categories").select("*").order("order_index"),
@@ -61,6 +62,7 @@ export default async function ServicesPage() {
           href: hero?.cta_secondary_link || CONTACT.phoneHref,
           icon: "phone",
         }}
+        settings={settingsRes.data}
       />
 
       <TreatmentProtocol steps={protocolRes.data ?? []} />

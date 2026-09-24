@@ -18,8 +18,9 @@ export const revalidate = 60;
 export default async function ReviewsPage() {
   const supabase = await createClient();
 
-  const [heroRes, reviewsRes] = await Promise.all([
+  const [heroRes, settingsRes, reviewsRes] = await Promise.all([
     supabase.from("pages_hero").select("*").eq("page_slug", "reviews").maybeSingle(),
+    supabase.from("clinic_settings").select("*").limit(1).maybeSingle(),
     supabase.from("reviews").select("*").eq("is_published", true).order("review_date", { ascending: false }),
   ]);
 
@@ -58,6 +59,7 @@ export default async function ReviewsPage() {
           href: hero?.cta_secondary_link || CONTACT.phoneHref,
           icon: "phone",
         }}
+        settings={settingsRes.data}
       />
 
       <PatientReviewsGrid reviews={reviewsRes.data ?? []} />

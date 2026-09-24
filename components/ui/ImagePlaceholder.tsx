@@ -33,7 +33,6 @@ export default function ImagePlaceholder({
       className={`relative flex h-full w-full items-center justify-center overflow-hidden bg-gradient-to-br ${variants[variant]} ${className}`}
     >
       <div className="absolute inset-0 bg-mesh-medical opacity-60" />
-      <div className="shimmer-overlay absolute inset-0 animate-shimmer opacity-40" />
       <Icon
         className={`relative ${iconSize} ${isLight ? "text-brand-500" : "text-white/90"}`}
         strokeWidth={1.2}

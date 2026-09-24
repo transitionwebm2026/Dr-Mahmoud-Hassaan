@@ -6,14 +6,42 @@ import Link from "next/link";
 import { Mail, MapPin, Music2, Phone } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { pick } from "@/lib/i18n";
-import { CONTACT, DOCTOR, NAV_LINKS, SOCIAL_LINKS } from "@/lib/constants";
+import { DOCTOR } from "@/lib/constants";
+import { getContactInfo } from "@/lib/site-contact";
+import { getSiteChrome, linkLabel } from "@/lib/site-navigation";
+import type { ClinicSettings } from "@/lib/supabase/types";
 import { FacebookIcon, InstagramIcon } from "./ui/SocialIcons";
 
-export default function Footer() {
+export default function Footer({ settings }: { settings: ClinicSettings | null }) {
   const { lang } = useLanguage();
   const year = new Date().getFullYear();
   const [logoFailed, setLogoFailed] = useState(false);
   const logoRef = useRef<HTMLImageElement>(null);
+
+  const tagline = pick(lang, {
+    ar: settings?.footer_tagline_ar || DOCTOR.title.ar,
+    en: settings?.footer_tagline_en || DOCTOR.title.en,
+  });
+  const disclaimer = pick(lang, {
+    ar:
+      settings?.footer_disclaimer_ar ||
+      "المحتوى الطبي لأغراض تعريفية ولا يغني عن استشارة الطبيب",
+    en:
+      settings?.footer_disclaimer_en ||
+      "Medical content is for informational purposes and does not replace professional consultation",
+  });
+  const { addressAr, addressEn, phoneDisplay, phoneHref, email, instagramUrl, facebookUrl, tiktokUrl } =
+    getContactInfo(settings);
+  const { logoUrl, brandName, footerQuickLinks, footerServices, showFooterSocial } = getSiteChrome(settings);
+  const copyright = pick(lang, {
+    ar: settings?.footer_copyright_ar || `${brandName.ar} — جميع الحقوق محفوظة`,
+    en: settings?.footer_copyright_en || `${brandName.en} — All rights reserved`,
+  });
+  const socialLinks = [
+    { icon: InstagramIcon, href: instagramUrl, label: "Instagram" },
+    { icon: FacebookIcon, href: facebookUrl, label: "Facebook" },
+    { icon: Music2, href: tiktokUrl, label: "TikTok" },
+  ];
 
   useEffect(() => {
     // Same SSR/hydration race as the hero photo: the server-rendered <img>
@@ -24,23 +52,26 @@ export default function Footer() {
     }
   }, []);
 
-  const services = [
-    { ar: "جراحة أورام الثدي", en: "Breast Cancer Surgery" },
-    { ar: "جراحة أورام الجهاز الهضمي", en: "GI Oncology Surgery" },
-    { ar: "جراحة الأورام بالمنظار", en: "Laparoscopic Oncology Surgery" },
-    { ar: "استشارات ما بعد الجراحة", en: "Post-Op Consultations" },
-  ];
-
   const columns = [
     {
-      title: { ar: "روابط سريعة", en: "Quick Links" },
-      items: NAV_LINKS.map((link) => ({ label: link.label, href: link.href })),
+      title: {
+        ar: settings?.footer_quicklinks_title_ar || "روابط سريعة",
+        en: settings?.footer_quicklinks_title_en || "Quick Links",
+      },
+      items: footerQuickLinks,
     },
     {
-      title: { ar: "أبرز الخدمات", en: "Key Services" },
-      items: services.map((service) => ({ label: service, href: "/services" })),
+      title: {
+        ar: settings?.footer_services_title_ar || "أبرز الخدمات",
+        en: settings?.footer_services_title_en || "Key Services",
+      },
+      items: footerServices,
     },
   ];
+  const contactColumnTitle = pick(lang, {
+    ar: settings?.footer_contact_title_ar || "معلومات التواصل",
+    en: settings?.footer_contact_title_en || "Contact Info",
+  });
 
   return (
     <footer className="relative mt-8 overflow-hidden bg-brand-gradient">
@@ -58,36 +89,34 @@ export default function Footer() {
             <Link href="/" className="inline-flex items-center gap-3">
               <span className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/25 bg-white/90 p-1.5 backdrop-blur-md shadow-glow-brand">
                 <Image
-                  src="/images/logo-icon.png"
-                  alt={pick(lang, DOCTOR.name)}
+                  src={logoUrl}
+                  alt={pick(lang, brandName)}
                   width={32}
                   height={32}
                   className="h-full w-full object-contain"
                 />
               </span>
               <span className="font-arabic text-base font-extrabold text-white">
-                {pick(lang, DOCTOR.name)}
+                {pick(lang, brandName)}
               </span>
             </Link>
-            <p className="mt-3 text-sm leading-relaxed text-white/65">{pick(lang, DOCTOR.title)}</p>
-            <div className="mt-4 flex items-center justify-center gap-3">
-              {[
-                { icon: InstagramIcon, href: SOCIAL_LINKS.instagram, label: "Instagram" },
-                { icon: FacebookIcon, href: SOCIAL_LINKS.facebook, label: "Facebook" },
-                { icon: Music2, href: SOCIAL_LINKS.tiktok, label: "TikTok" },
-              ].map(({ icon: Icon, href, label }) => (
-                <a
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={label}
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:bg-white/25"
-                >
-                  <Icon className="h-4 w-4" />
-                </a>
-              ))}
-            </div>
+            <p className="mt-3 text-sm leading-relaxed text-white/65">{tagline}</p>
+            {showFooterSocial && (
+              <div className="mt-4 flex items-center justify-center gap-3">
+                {socialLinks.map(({ icon: Icon, href, label }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={label}
+                    className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:bg-white/25"
+                  >
+                    <Icon className="h-4 w-4" />
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
 
           {columns.map((column) => (
@@ -96,13 +125,13 @@ export default function Footer() {
                 {pick(lang, column.title)}
               </h4>
               <ul className="space-y-2">
-                {column.items.map((item) => (
-                  <li key={item.label.en}>
+                {column.items.map((item, index) => (
+                  <li key={index}>
                     <Link
                       href={item.href}
                       className="text-sm text-white/65 transition-colors hover:text-white"
                     >
-                      {pick(lang, item.label)}
+                      {linkLabel(item, lang)}
                     </Link>
                   </li>
                 ))}
@@ -112,7 +141,7 @@ export default function Footer() {
 
           <div>
             <h4 className="mb-3 text-sm font-extrabold text-white">
-              {pick(lang, { ar: "معلومات التواصل", en: "Contact Info" })}
+              {contactColumnTitle}
             </h4>
             {/* w-fit + mx-auto centers this block as a whole, while each row stays
                 start-aligned within it — keeps the three icons in one clean
@@ -120,18 +149,18 @@ export default function Footer() {
             <ul className="mx-auto w-fit space-y-2.5">
               <li className="flex items-start gap-2.5 text-sm text-white/65">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-white/70" />
-                <span className="text-start">{pick(lang, CONTACT.address)}</span>
+                <span className="text-start">{pick(lang, { ar: addressAr, en: addressEn })}</span>
               </li>
               <li className="flex items-center gap-2.5 text-sm text-white/65">
                 <Phone className="h-4 w-4 shrink-0 text-white/70" />
-                <a href={CONTACT.phoneHref} dir="ltr" className="hover:text-white">
-                  {CONTACT.phoneDisplay}
+                <a href={phoneHref} dir="ltr" className="hover:text-white">
+                  {phoneDisplay}
                 </a>
               </li>
               <li className="flex items-center gap-2.5 text-sm text-white/65">
                 <Mail className="h-4 w-4 shrink-0 text-white/70" />
-                <a href={`mailto:${CONTACT.email}`} dir="ltr" className="hover:text-white">
-                  {CONTACT.email}
+                <a href={`mailto:${email}`} dir="ltr" className="hover:text-white">
+                  {email}
                 </a>
               </li>
             </ul>
@@ -141,14 +170,9 @@ export default function Footer() {
         {/* Centered bottom bar */}
         <div className="mx-auto mt-8 flex max-w-5xl flex-col items-center gap-4 border-t border-white/15 pt-6 text-center">
           <p className="text-xs text-white/60">
-            © {year} {pick(lang, DOCTOR.name)} — {pick(lang, { ar: "جميع الحقوق محفوظة", en: "All rights reserved" })}
+            © {year} {copyright}
           </p>
-          <p className="text-xs text-white/40">
-            {pick(lang, {
-              ar: "المحتوى الطبي لأغراض تعريفية ولا يغني عن استشارة الطبيب",
-              en: "Medical content is for informational purposes and does not replace professional consultation",
-            })}
-          </p>
+          <p className="text-xs text-white/40">{disclaimer}</p>
 
           {/* Agency credit */}
           <a

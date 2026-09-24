@@ -18,8 +18,9 @@ export const revalidate = 60;
 export default async function ArticlesPage() {
   const supabase = await createClient();
 
-  const [heroRes, articlesRes] = await Promise.all([
+  const [heroRes, settingsRes, articlesRes] = await Promise.all([
     supabase.from("pages_hero").select("*").eq("page_slug", "articles").maybeSingle(),
+    supabase.from("clinic_settings").select("*").limit(1).maybeSingle(),
     supabase
       .from("articles")
       .select("*")
@@ -58,6 +59,7 @@ export default async function ArticlesPage() {
           href: hero?.cta_secondary_link || CONTACT.phoneHref,
           icon: "phone",
         }}
+        settings={settingsRes.data}
       />
 
       <ArticlesSection articles={articlesRes.data ?? []} />

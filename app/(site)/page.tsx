@@ -26,10 +26,11 @@ export const revalidate = 60;
 export default async function HomePage() {
   const supabase = await createClient();
 
-  const [heroRes, profileRes, surgeriesRes, treatmentsRes, whyDoctorRes, journeyRes, reviewsRes, videosRes, faqsRes] =
+  const [heroRes, profileRes, settingsRes, surgeriesRes, treatmentsRes, whyDoctorRes, journeyRes, reviewsRes, videosRes, faqsRes] =
     await Promise.all([
       supabase.from("pages_hero").select("*").eq("page_slug", "home").maybeSingle(),
       supabase.from("doctor_profile").select("*").limit(1).maybeSingle(),
+      supabase.from("clinic_settings").select("*").limit(1).maybeSingle(),
       supabase.from("surgeries_services").select("*").eq("is_published", true).order("order_index").limit(3),
       supabase.from("treatments").select("*").eq("is_published", true).order("order_index").limit(3),
       supabase.from("why_doctor").select("*").order("order_index"),
@@ -65,6 +66,7 @@ export default async function HomePage() {
           href: hero?.cta_secondary_link || "/services",
           icon: "services",
         }}
+        settings={settingsRes.data}
       />
 
       <StatsBar

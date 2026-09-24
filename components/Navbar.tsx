@@ -8,10 +8,12 @@ import { AnimatePresence, motion } from "framer-motion";
 import { CalendarCheck, Menu, Phone, X } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { pick } from "@/lib/i18n";
-import { CONTACT, DOCTOR, NAV_LINKS } from "@/lib/constants";
+import { getContactInfo } from "@/lib/site-contact";
+import { getSiteChrome, linkLabel } from "@/lib/site-navigation";
+import type { ClinicSettings } from "@/lib/supabase/types";
 import LanguageToggle from "./LanguageToggle";
 
-export default function Navbar() {
+export default function Navbar({ settings }: { settings: ClinicSettings | null }) {
   const { lang } = useLanguage();
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
@@ -24,7 +26,14 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const bookLabel = pick(lang, { ar: "حجز كشف", en: "Book a Visit" });
+  const bookLabel = pick(lang, {
+    ar: settings?.navbar_cta_text_ar || "حجز كشف",
+    en: settings?.navbar_cta_text_en || "Book a Visit",
+  });
+  const bookHref = settings?.navbar_cta_link || "/contact";
+
+  const { phoneDisplay, phoneHref } = getContactInfo(settings);
+  const { logoUrl, brandName, brandSubtitle, navLinks, showNavbarCta, showNavbarPhone } = getSiteChrome(settings);
 
   return (
     <header className="sticky top-0 z-50 w-full py-4">
@@ -40,8 +49,8 @@ export default function Navbar() {
           <Link href="/" className="flex shrink-0 items-center gap-2.5 sm:gap-3">
             <span className="relative flex h-11 w-11 shrink-0 items-center justify-center">
               <Image
-                src="/images/logo-icon.png"
-                alt={pick(lang, DOCTOR.name)}
+                src={logoUrl}
+                alt={pick(lang, brandName)}
                 width={44}
                 height={44}
                 priority
@@ -54,25 +63,25 @@ export default function Navbar() {
                   scrolled ? "text-ink" : "text-white"
                 }`}
               >
-                {pick(lang, DOCTOR.name)}
+                {pick(lang, brandName)}
               </span>
               <span
                 className={`whitespace-nowrap text-[11px] font-medium transition-colors duration-500 ${
                   scrolled ? "text-brand-700" : "text-brand-100"
                 }`}
               >
-                {pick(lang, DOCTOR.shortTitle)}
+                {pick(lang, brandSubtitle)}
               </span>
             </span>
           </Link>
 
           {/* Desktop nav */}
           <nav className="no-scrollbar hidden min-w-0 items-center gap-1 overflow-x-auto xl:flex">
-            {NAV_LINKS.map((link) => {
+            {navLinks.map((link) => {
               const active = pathname === link.href;
               return (
                 <Link
-                  key={link.href}
+                  key={`${link.href}-${link.label_en}`}
                   href={link.href}
                   className={`group relative shrink-0 whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold transition-colors duration-300 ${
                     active
@@ -95,7 +104,7 @@ export default function Navbar() {
                       }`}
                     />
                   )}
-                  {pick(lang, link.label)}
+                  {linkLabel(link, lang)}
                 </Link>
               );
             })}
@@ -105,13 +114,15 @@ export default function Navbar() {
           <div className="flex shrink-0 items-center gap-2">
             <LanguageToggle scrolled={scrolled} />
 
-            <Link
-              href="/contact"
-              className="btn-primary hidden shrink-0 whitespace-nowrap !px-5 !py-2.5 text-sm md:inline-flex"
-            >
-              <CalendarCheck className="h-4 w-4" />
-              {bookLabel}
-            </Link>
+            {showNavbarCta && (
+              <Link
+                href={bookHref}
+                className="btn-primary hidden shrink-0 whitespace-nowrap !px-5 !py-2.5 text-sm md:inline-flex"
+              >
+                <CalendarCheck className="h-4 w-4" />
+                {bookLabel}
+              </Link>
+            )}
 
             <button
               type="button"
@@ -140,9 +151,9 @@ export default function Navbar() {
               className="overflow-hidden xl:hidden"
             >
               <div className="mt-3 flex flex-col gap-1 rounded-3xl border border-white/40 bg-white/80 p-4 shadow-glass backdrop-blur-lg">
-                {NAV_LINKS.map((link) => (
+                {navLinks.map((link) => (
                   <Link
-                    key={link.href}
+                    key={`${link.href}-${link.label_en}`}
                     href={link.href}
                     onClick={() => setOpen(false)}
                     className={`rounded-2xl px-4 py-3 text-sm font-semibold transition-colors ${
@@ -151,26 +162,30 @@ export default function Navbar() {
                         : "text-ink/70 hover:bg-brand/5"
                     }`}
                   >
-                    {pick(lang, link.label)}
+                    {linkLabel(link, lang)}
                   </Link>
                 ))}
-                <a
-                  href={CONTACT.phoneHref}
-                  dir="ltr"
-                  onClick={() => setOpen(false)}
-                  className="mt-2 flex items-center gap-2 rounded-2xl border border-brand/20 bg-brand/5 px-4 py-3 text-sm font-bold text-brand-700"
-                >
-                  <Phone className="h-4 w-4" />
-                  {CONTACT.phoneDisplay}
-                </a>
-                <Link
-                  href="/contact"
-                  onClick={() => setOpen(false)}
-                  className="btn-primary mt-2 w-full"
-                >
-                  <CalendarCheck className="h-4 w-4" />
-                  {bookLabel}
-                </Link>
+                {showNavbarPhone && (
+                  <a
+                    href={phoneHref}
+                    dir="ltr"
+                    onClick={() => setOpen(false)}
+                    className="mt-2 flex items-center gap-2 rounded-2xl border border-brand/20 bg-brand/5 px-4 py-3 text-sm font-bold text-brand-700"
+                  >
+                    <Phone className="h-4 w-4" />
+                    {phoneDisplay}
+                  </a>
+                )}
+                {showNavbarCta && (
+                  <Link
+                    href={bookHref}
+                    onClick={() => setOpen(false)}
+                    className="btn-primary mt-2 w-full"
+                  >
+                    <CalendarCheck className="h-4 w-4" />
+                    {bookLabel}
+                  </Link>
+                )}
               </div>
             </motion.div>
           )}

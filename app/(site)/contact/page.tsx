@@ -53,6 +53,7 @@ export default async function ContactPage() {
           href: hero?.cta_secondary_link || CONTACT.phoneHref,
           icon: "phone",
         }}
+        settings={settingsRes.data}
       />
 
       <ContactFormMapSection clinicSettings={settingsRes.data} />

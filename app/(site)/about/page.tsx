@@ -22,9 +22,10 @@ export const revalidate = 60;
 export default async function AboutPage() {
   const supabase = await createClient();
 
-  const [heroRes, profileRes, milestonesRes, expertiseRes, certsRes] = await Promise.all([
+  const [heroRes, profileRes, settingsRes, milestonesRes, expertiseRes, certsRes] = await Promise.all([
     supabase.from("pages_hero").select("*").eq("page_slug", "about").maybeSingle(),
     supabase.from("doctor_profile").select("*").limit(1).maybeSingle(),
+    supabase.from("clinic_settings").select("*").limit(1).maybeSingle(),
     supabase.from("career_milestones").select("*").order("order_index"),
     supabase.from("surgeries_services").select("*").eq("is_published", true).order("order_index").limit(3),
     supabase.from("certifications").select("*").order("order_index"),
@@ -61,6 +62,7 @@ export default async function AboutPage() {
           href: hero?.cta_secondary_link || "#doctor-intro",
           icon: "video",
         }}
+        settings={settingsRes.data}
       />
 
       <DoctorMessage

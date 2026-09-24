@@ -14,7 +14,9 @@ import {
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { pick, type Bilingual } from "@/lib/i18n";
-import { CONTACT, DOCTOR, SOCIAL_LINKS } from "@/lib/constants";
+import { DOCTOR } from "@/lib/constants";
+import { getContactInfo } from "@/lib/site-contact";
+import type { ClinicSettings } from "@/lib/supabase/types";
 import ImagePlaceholder from "./ui/ImagePlaceholder";
 import { FacebookIcon, InstagramIcon } from "./ui/SocialIcons";
 
@@ -54,6 +56,7 @@ interface HeroProps {
   primaryCta?: HeroCta;
   /** Overrides the default "Watch Intro Video" secondary button. */
   secondaryCta?: HeroCta;
+  settings?: ClinicSettings | null;
 }
 
 const DEFAULT_PHOTO_SRC = "/images/hero-doctor.jpg";
@@ -70,12 +73,6 @@ const DEFAULT_SECONDARY_CTA: HeroCta = {
   icon: "video",
 };
 
-const socials = [
-  { icon: InstagramIcon, href: SOCIAL_LINKS.instagram, label: "Instagram" },
-  { icon: FacebookIcon, href: SOCIAL_LINKS.facebook, label: "Facebook" },
-  { icon: Music2, href: SOCIAL_LINKS.tiktok, label: "TikTok" },
-];
-
 /** Internal routes/hashes use next/link for client-side transitions; tel:, mailto:, and anchors use a plain anchor. */
 function isClientRoute(href: string) {
   return href.startsWith("/");
@@ -88,10 +85,17 @@ export default function Hero({
   photoSrc = DEFAULT_PHOTO_SRC,
   primaryCta = DEFAULT_PRIMARY_CTA,
   secondaryCta = DEFAULT_SECONDARY_CTA,
+  settings = null,
 }: HeroProps) {
   const { lang } = useLanguage();
   const [photoFailed, setPhotoFailed] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
+  const { phoneDisplay, phoneHref, instagramUrl, facebookUrl, tiktokUrl } = getContactInfo(settings);
+  const socials = [
+    { icon: InstagramIcon, href: instagramUrl, label: "Instagram" },
+    { icon: FacebookIcon, href: facebookUrl, label: "Facebook" },
+    { icon: Music2, href: tiktokUrl, label: "TikTok" },
+  ];
 
   useEffect(() => {
     // The <img> is server-rendered, so the browser can start (and on a fast
@@ -108,14 +112,14 @@ export default function Hero({
   const contactPanelContent = (
     <>
       <a
-        href={CONTACT.phoneHref}
+        href={phoneHref}
         dir="ltr"
         className="flex items-center gap-3 rounded-2xl px-1 py-1 text-sm font-bold text-white transition hover:bg-white/10"
       >
         <span className="icon-chip !h-9 !w-9">
           <Phone className="h-4 w-4" />
         </span>
-        {CONTACT.phoneDisplay}
+        {phoneDisplay}
       </a>
       <div className="flex items-center justify-center gap-2 border-t border-white/20 pt-2 sm:pt-3">
         {socials.map(({ icon: Icon, href, label }) => (
