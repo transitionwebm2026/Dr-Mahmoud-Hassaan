@@ -8,12 +8,15 @@ import { useLanguage } from "@/context/LanguageContext";
 import { pick } from "@/lib/i18n";
 import type { SurgeryService } from "@/lib/supabase/types";
 import GlassCard from "../GlassCard";
+import SectionHeading from "@/components/ui/SectionHeading";
+import type { SectionHeadingContent } from "@/lib/section-headings";
 
 export interface KeySurgeriesProps {
+  heading: SectionHeadingContent;
   items: SurgeryService[];
 }
 
-export default function KeySurgeries({ items }: KeySurgeriesProps) {
+export default function KeySurgeries({ items, heading }: KeySurgeriesProps) {
   const { lang } = useLanguage();
   const ArrowIcon = lang === "ar" ? ArrowLeft : ArrowRight;
 
@@ -29,19 +32,7 @@ export default function KeySurgeries({ items }: KeySurgeriesProps) {
           transition={{ duration: 0.6 }}
           className="mx-auto max-w-2xl text-center"
         >
-          <span className="section-eyebrow">
-            <Scissors className="h-4 w-4" />
-            {pick(lang, { ar: "أبرز الجراحات", en: "Key Surgeries" })}
-          </span>
-          <h2 className="mt-5 text-2xl font-extrabold text-ink sm:text-3xl lg:text-4xl">
-            {pick(lang, { ar: "تخصصات جراحية دقيقة", en: "Precision Surgical Specialties" })}
-          </h2>
-          <p className="mt-4 text-sm leading-relaxed text-ink/60 sm:text-base">
-            {pick(lang, {
-              ar: "نقدم رعاية جراحية متكاملة لمختلف أنواع الأورام بأحدث التقنيات وأعلى معايير السلامة.",
-              en: "Comprehensive surgical care for a wide range of tumors using the latest techniques and the highest safety standards.",
-            })}
-          </p>
+          <SectionHeading heading={heading} icon={Scissors} />
         </motion.div>
 
         <div className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">

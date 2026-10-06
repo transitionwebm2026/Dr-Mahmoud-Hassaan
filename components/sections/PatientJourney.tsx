@@ -7,12 +7,15 @@ import { useLanguage } from "@/context/LanguageContext";
 import { pick } from "@/lib/i18n";
 import { DynamicIcon } from "@/lib/icon-registry";
 import type { PatientJourneyStep } from "@/lib/supabase/types";
+import SectionHeading from "@/components/ui/SectionHeading";
+import type { SectionHeadingContent } from "@/lib/section-headings";
 
 export interface PatientJourneyProps {
+  heading: SectionHeadingContent;
   steps: PatientJourneyStep[];
 }
 
-export default function PatientJourney({ steps }: PatientJourneyProps) {
+export default function PatientJourney({ steps, heading }: PatientJourneyProps) {
   const { lang } = useLanguage();
   const [active, setActive] = useState(0);
 
@@ -28,19 +31,7 @@ export default function PatientJourney({ steps }: PatientJourneyProps) {
           transition={{ duration: 0.6 }}
           className="mx-auto max-w-2xl text-center"
         >
-          <span className="section-eyebrow">
-            <Map className="h-4 w-4" />
-            {pick(lang, { ar: "رحلة المريض", en: "Patient Journey" })}
-          </span>
-          <h2 className="mt-5 text-2xl font-extrabold text-ink sm:text-3xl lg:text-4xl">
-            {pick(lang, { ar: "خطوتك نحو الشفاء", en: "Your Roadmap to Recovery" })}
-          </h2>
-          <p className="mt-4 text-sm leading-relaxed text-ink/60 sm:text-base">
-            {pick(lang, {
-              ar: "خارطة طريق واضحة من التشخيص وحتى التعافي الكامل بعد الجراحة.",
-              en: "A clear, step-by-step roadmap from diagnosis to full post-op recovery.",
-            })}
-          </p>
+          <SectionHeading heading={heading} icon={Map} />
         </motion.div>
 
         {/* Roadmap */}

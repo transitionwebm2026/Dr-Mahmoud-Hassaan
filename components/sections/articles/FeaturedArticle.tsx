@@ -8,12 +8,15 @@ import { useLanguage } from "@/context/LanguageContext";
 import { pick } from "@/lib/i18n";
 import { formatArticleDate, formatReadingTime } from "@/lib/supabase/content";
 import type { Article } from "@/lib/supabase/types";
+import SectionHeading from "@/components/ui/SectionHeading";
+import type { SectionHeadingContent } from "@/lib/section-headings";
 
 interface FeaturedArticleProps {
+  heading: SectionHeadingContent;
   article: Article;
 }
 
-export default function FeaturedArticle({ article }: FeaturedArticleProps) {
+export default function FeaturedArticle({ article, heading }: FeaturedArticleProps) {
   const { lang } = useLanguage();
   const ArrowIcon = lang === "ar" ? ArrowLeft : ArrowRight;
 
@@ -27,13 +30,7 @@ export default function FeaturedArticle({ article }: FeaturedArticleProps) {
           transition={{ duration: 0.6 }}
           className="mx-auto mb-10 max-w-2xl text-center"
         >
-          <span className="section-eyebrow">
-            <Sparkles className="h-4 w-4" />
-            {pick(lang, { ar: "مقال مميز", en: "Featured Article" })}
-          </span>
-          <h2 className="mt-5 text-2xl font-extrabold text-ink sm:text-3xl lg:text-4xl">
-            {pick(lang, { ar: "المقالات والمحتوى الطبي", en: "Articles & Medical Insights" })}
-          </h2>
+          <SectionHeading heading={heading} icon={Sparkles} />
         </motion.div>
 
         <motion.div

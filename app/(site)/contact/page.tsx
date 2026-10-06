@@ -5,6 +5,7 @@ import ContactFormMapSection from "@/components/sections/contact/ContactFormMapS
 import { CONTACT } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/server";
 import { toBilingual } from "@/lib/supabase/content";
+import { resolveSectionHeadings } from "@/lib/section-headings";
 
 export const metadata: Metadata = {
   title: "تواصل معنا | Contact Us",
@@ -18,12 +19,14 @@ export const revalidate = 60;
 export default async function ContactPage() {
   const supabase = await createClient();
 
-  const [heroRes, settingsRes] = await Promise.all([
+  const [heroRes, settingsRes, headingsRes] = await Promise.all([
     supabase.from("pages_hero").select("*").eq("page_slug", "contact").maybeSingle(),
     supabase.from("clinic_settings").select("*").limit(1).maybeSingle(),
+    supabase.from("section_headings").select("*").eq("page_slug", "contact"),
   ]);
 
   const hero = heroRes.data;
+  const headings = resolveSectionHeadings("contact", headingsRes.data);
 
   return (
     <>
@@ -56,7 +59,7 @@ export default async function ContactPage() {
         settings={settingsRes.data}
       />
 
-      <ContactFormMapSection clinicSettings={settingsRes.data} />
+      <ContactFormMapSection heading={headings.booking} clinicSettings={settingsRes.data} />
 
       <FooterCTA
         title={

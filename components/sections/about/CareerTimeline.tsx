@@ -7,6 +7,8 @@ import { useLanguage } from "@/context/LanguageContext";
 import { pick } from "@/lib/i18n";
 import { DynamicIcon } from "@/lib/icon-registry";
 import type { CareerMilestone } from "@/lib/supabase/types";
+import SectionHeading from "@/components/ui/SectionHeading";
+import type { SectionHeadingContent } from "@/lib/section-headings";
 
 function TimelineNode({ milestone, index }: { milestone: CareerMilestone; index: number }) {
   const { lang } = useLanguage();
@@ -55,11 +57,11 @@ function TimelineNode({ milestone, index }: { milestone: CareerMilestone; index:
 }
 
 export interface CareerTimelineProps {
+  heading: SectionHeadingContent;
   milestones: CareerMilestone[];
 }
 
-export default function CareerTimeline({ milestones }: CareerTimelineProps) {
-  const { lang } = useLanguage();
+export default function CareerTimeline({ milestones, heading }: CareerTimelineProps) {
   const trackRef = useRef<HTMLDivElement>(null);
 
   // Scroll-scrubbed progress: the line fill and the glowing marker are tied
@@ -84,19 +86,7 @@ export default function CareerTimeline({ milestones }: CareerTimelineProps) {
           transition={{ duration: 0.6 }}
           className="mx-auto max-w-2xl text-center"
         >
-          <span className="section-eyebrow">
-            <Milestone className="h-4 w-4" />
-            {pick(lang, { ar: "المسيرة العملية", en: "Career Journey" })}
-          </span>
-          <h2 className="mt-5 text-2xl font-extrabold text-ink sm:text-3xl lg:text-4xl">
-            {pick(lang, { ar: "محطات في مسيرة التميز", en: "Milestones of a Distinguished Career" })}
-          </h2>
-          <p className="mt-4 text-sm leading-relaxed text-ink/60 sm:text-base">
-            {pick(lang, {
-              ar: "من مقاعد الدراسة إلى غرف العمليات، رحلة علمية وعملية مبنية على التعلم المستمر.",
-              en: "From the classroom to the operating room — a journey built on continuous learning.",
-            })}
-          </p>
+          <SectionHeading heading={heading} icon={Milestone} />
         </motion.div>
 
         <div ref={trackRef} className="relative mt-16">

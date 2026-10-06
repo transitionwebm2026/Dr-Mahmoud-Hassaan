@@ -7,14 +7,17 @@ import { useLanguage } from "@/context/LanguageContext";
 import { pick } from "@/lib/i18n";
 import { DynamicIcon } from "@/lib/icon-registry";
 import type { TreatmentProtocolStep } from "@/lib/supabase/types";
+import SectionHeading from "@/components/ui/SectionHeading";
+import type { SectionHeadingContent } from "@/lib/section-headings";
 
 const AUTO_ADVANCE_MS = 4500;
 
 export interface TreatmentProtocolProps {
+  heading: SectionHeadingContent;
   steps: TreatmentProtocolStep[];
 }
 
-export default function TreatmentProtocol({ steps }: TreatmentProtocolProps) {
+export default function TreatmentProtocol({ steps, heading }: TreatmentProtocolProps) {
   const { lang } = useLanguage();
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -40,19 +43,7 @@ export default function TreatmentProtocol({ steps }: TreatmentProtocolProps) {
           transition={{ duration: 0.6 }}
           className="mx-auto max-w-2xl text-center"
         >
-          <span className="section-eyebrow">
-            <Workflow className="h-4 w-4" />
-            {pick(lang, { ar: "إيجاد خطة العلاج المناسبة", en: "Finding the Right Treatment Plan" })}
-          </span>
-          <h2 className="mt-5 text-2xl font-extrabold text-ink sm:text-3xl lg:text-4xl">
-            {pick(lang, { ar: "بروتوكول واضح لكل حالة", en: "A Clear Protocol for Every Case" })}
-          </h2>
-          <p className="mt-4 text-sm leading-relaxed text-ink/60 sm:text-base">
-            {pick(lang, {
-              ar: "خطوات مبنية على أفضل الممارسات العالمية — اضغط على أي خطوة لاستكشافها.",
-              en: "Steps built on global best practices — click any step to explore it.",
-            })}
-          </p>
+          <SectionHeading heading={heading} icon={Workflow} />
         </motion.div>
 
         <div

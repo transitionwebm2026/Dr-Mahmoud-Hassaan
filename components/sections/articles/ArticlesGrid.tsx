@@ -9,12 +9,15 @@ import { pick } from "@/lib/i18n";
 import { formatArticleDate, formatReadingTime } from "@/lib/supabase/content";
 import GlassCard from "@/components/GlassCard";
 import type { Article } from "@/lib/supabase/types";
+import SectionHeading from "@/components/ui/SectionHeading";
+import type { SectionHeadingContent } from "@/lib/section-headings";
 
 interface ArticlesGridProps {
+  heading: SectionHeadingContent;
   articles: Article[];
 }
 
-export default function ArticlesGrid({ articles }: ArticlesGridProps) {
+export default function ArticlesGrid({ articles, heading }: ArticlesGridProps) {
   const { lang } = useLanguage();
   const ArrowIcon = lang === "ar" ? ArrowLeft : ArrowRight;
 
@@ -28,13 +31,7 @@ export default function ArticlesGrid({ articles }: ArticlesGridProps) {
           transition={{ duration: 0.6 }}
           className="mx-auto mb-12 max-w-2xl text-center"
         >
-          <span className="section-eyebrow">
-            <Newspaper className="h-4 w-4" />
-            {pick(lang, { ar: "أحدث المقالات", en: "Latest Articles" })}
-          </span>
-          <h2 className="mt-5 text-2xl font-extrabold text-ink sm:text-3xl lg:text-4xl">
-            {pick(lang, { ar: "مقالات تستحق وقتك", en: "Articles Worth Your Time" })}
-          </h2>
+          <SectionHeading heading={heading} icon={Newspaper} />
         </motion.div>
 
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">

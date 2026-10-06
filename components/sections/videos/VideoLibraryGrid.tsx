@@ -8,16 +8,19 @@ import { Clapperboard, Play } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { pick } from "@/lib/i18n";
 import type { Video } from "@/lib/supabase/types";
+import SectionHeading from "@/components/ui/SectionHeading";
+import type { SectionHeadingContent } from "@/lib/section-headings";
 
 // Only needed once a card is clicked, so it's split into its own chunk
 // instead of shipping in the initial page bundle for every visitor.
 const VideoPopup = dynamic(() => import("@/components/VideoPopup"), { ssr: false });
 
 export interface VideoLibraryGridProps {
+  heading: SectionHeadingContent;
   videos: Video[];
 }
 
-export default function VideoLibraryGrid({ videos }: VideoLibraryGridProps) {
+export default function VideoLibraryGrid({ videos, heading }: VideoLibraryGridProps) {
   const { lang } = useLanguage();
   const [selected, setSelected] = useState<number | null>(null);
 
@@ -33,19 +36,7 @@ export default function VideoLibraryGrid({ videos }: VideoLibraryGridProps) {
           transition={{ duration: 0.6 }}
           className="mx-auto max-w-2xl text-center"
         >
-          <span className="section-eyebrow">
-            <Clapperboard className="h-4 w-4" />
-            {pick(lang, { ar: "مكتبة الفيديوهات الطبية", en: "Medical Video Library" })}
-          </span>
-          <h2 className="mt-5 text-2xl font-extrabold text-ink sm:text-3xl lg:text-4xl">
-            {pick(lang, { ar: "محتوى توعوي يستحق المشاهدة", en: "Educational Content Worth Watching" })}
-          </h2>
-          <p className="mt-4 text-sm leading-relaxed text-ink/60 sm:text-base">
-            {pick(lang, {
-              ar: "شروحات جراحية ونصائح للمرضى في فيديوهات قصيرة وواضحة.",
-              en: "Surgical explanations and patient advice in short, clear videos.",
-            })}
-          </p>
+          <SectionHeading heading={heading} icon={Clapperboard} />
         </motion.div>
 
         <div className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">

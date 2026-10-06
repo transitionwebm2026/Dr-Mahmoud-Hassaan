@@ -7,7 +7,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Play, ShieldCheck, Sparkles } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { pick } from "@/lib/i18n";
-import { DOCTOR } from "@/lib/constants";
+import { stripHighlight } from "@/lib/supabase/content";
+import SectionHeading from "@/components/ui/SectionHeading";
+import type { SectionHeadingContent } from "@/lib/section-headings";
 
 // Only needed once the poster is clicked, so it's split into its own chunk
 // instead of shipping in the initial page bundle for every visitor.
@@ -26,12 +28,14 @@ const DEFAULT_HIGHLIGHTS_EN = [
 ];
 
 export interface DoctorIntroVideoProps {
+  heading: SectionHeadingContent;
   highlightsAr?: string[];
   highlightsEn?: string[];
   videoUrl?: string | null;
 }
 
 export default function DoctorIntroVideo({
+  heading,
   highlightsAr = DEFAULT_HIGHLIGHTS_AR,
   highlightsEn = DEFAULT_HIGHLIGHTS_EN,
   videoUrl,
@@ -53,20 +57,11 @@ export default function DoctorIntroVideo({
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           className="text-center lg:text-start"
         >
-          <span className="section-eyebrow">
-            <Sparkles className="h-4 w-4" />
-            {pick(lang, { ar: "تعرف على طبيبك", en: "Meet Your Doctor" })}
-          </span>
-          <h2 className="mt-5 text-2xl font-extrabold text-ink sm:text-3xl lg:text-4xl">
-            {pick(lang, { ar: "رسالة تعريفية من ", en: "An introduction from " })}
-            <span className="text-gradient-brand">{pick(lang, DOCTOR.name)}</span>
-          </h2>
-          <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-ink/65 sm:text-base lg:mx-0">
-            {pick(lang, {
-              ar: "في هذا الفيديو، يشارككم د. محمود حسان نهجه في التعامل مع مرضى الأورام، وأهمية التشخيص المبكر، ودور الجراحة الدقيقة في رحلة الشفاء.",
-              en: "In this short video, Dr. Mahmoud Hassan shares his approach to treating oncology patients, the importance of early diagnosis, and the role of precise surgery in the recovery journey.",
-            })}
-          </p>
+          <SectionHeading
+            heading={heading}
+            icon={Sparkles}
+            descriptionClassName="mx-auto mt-4 max-w-md text-sm leading-relaxed text-ink/65 sm:text-base lg:mx-0"
+          />
 
           <ul className="mx-auto mt-6 max-w-md space-y-3 lg:mx-0">
             {highlights.map((item) => (
@@ -122,10 +117,7 @@ export default function DoctorIntroVideo({
           <VideoPopup
             src={videoUrl}
             poster="/images/video-poster.jpg"
-            title={pick(lang, {
-              ar: `رسالة تعريفية من ${DOCTOR.name.ar}`,
-              en: `An introduction from ${DOCTOR.name.en}`,
-            })}
+            title={stripHighlight(pick(lang, heading.title))}
             onClose={() => setOpen(false)}
           />
         )}

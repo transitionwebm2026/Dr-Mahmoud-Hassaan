@@ -8,12 +8,15 @@ import { useLanguage } from "@/context/LanguageContext";
 import { pick } from "@/lib/i18n";
 import type { Treatment } from "@/lib/supabase/types";
 import GlassCard from "../GlassCard";
+import SectionHeading from "@/components/ui/SectionHeading";
+import type { SectionHeadingContent } from "@/lib/section-headings";
 
 export interface KeyTreatmentsProps {
+  heading: SectionHeadingContent;
   items: Treatment[];
 }
 
-export default function KeyTreatments({ items }: KeyTreatmentsProps) {
+export default function KeyTreatments({ items, heading }: KeyTreatmentsProps) {
   const { lang } = useLanguage();
   const ArrowIcon = lang === "ar" ? ArrowLeft : ArrowRight;
 
@@ -29,19 +32,7 @@ export default function KeyTreatments({ items }: KeyTreatmentsProps) {
           transition={{ duration: 0.6 }}
           className="mx-auto max-w-2xl text-center"
         >
-          <span className="section-eyebrow">
-            <Stethoscope className="h-4 w-4" />
-            {pick(lang, { ar: "أبرز العلاجات", en: "Key Treatments" })}
-          </span>
-          <h2 className="mt-5 text-2xl font-extrabold text-ink sm:text-3xl lg:text-4xl">
-            {pick(lang, { ar: "رعاية متكاملة في كل خطوة", en: "Integrated Care at Every Step" })}
-          </h2>
-          <p className="mt-4 text-sm leading-relaxed text-ink/60 sm:text-base">
-            {pick(lang, {
-              ar: "من التشخيص الدقيق إلى التعافي الكامل، نرافق مرضانا بخطة علاجية واضحة ومخصصة.",
-              en: "From accurate diagnosis to full recovery, patients are guided with a clear, personalized plan.",
-            })}
-          </p>
+          <SectionHeading heading={heading} icon={Stethoscope} />
         </motion.div>
 
         <div className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">

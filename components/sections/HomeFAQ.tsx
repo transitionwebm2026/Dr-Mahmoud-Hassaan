@@ -6,12 +6,15 @@ import { ChevronDown, HelpCircle } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { pick } from "@/lib/i18n";
 import type { Faq } from "@/lib/supabase/types";
+import SectionHeading from "@/components/ui/SectionHeading";
+import type { SectionHeadingContent } from "@/lib/section-headings";
 
 export interface HomeFAQProps {
+  heading: SectionHeadingContent;
   faqs: Faq[];
 }
 
-export default function HomeFAQ({ faqs }: HomeFAQProps) {
+export default function HomeFAQ({ faqs, heading }: HomeFAQProps) {
   const { lang } = useLanguage();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
@@ -27,19 +30,7 @@ export default function HomeFAQ({ faqs }: HomeFAQProps) {
           transition={{ duration: 0.6 }}
           className="mx-auto max-w-2xl text-center"
         >
-          <span className="section-eyebrow">
-            <HelpCircle className="h-4 w-4" />
-            {pick(lang, { ar: "الأسئلة الشائعة", en: "Frequently Asked Questions" })}
-          </span>
-          <h2 className="mt-5 text-2xl font-extrabold text-ink sm:text-3xl lg:text-4xl">
-            {pick(lang, { ar: "إجابات سريعة على أهم استفساراتك", en: "Quick Answers to Your Top Questions" })}
-          </h2>
-          <p className="mt-4 text-sm leading-relaxed text-ink/60 sm:text-base">
-            {pick(lang, {
-              ar: "نظرة عامة على التخصصات والاستشارات والحجز والمتابعة بعد العلاج.",
-              en: "An overview of specialties, consultations, booking, and post-treatment follow-up.",
-            })}
-          </p>
+          <SectionHeading heading={heading} icon={HelpCircle} />
         </motion.div>
 
         {/* items-start: without it, CSS Grid stretches every card in a row

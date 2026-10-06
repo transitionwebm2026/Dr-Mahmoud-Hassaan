@@ -325,3 +325,22 @@ export interface ProcedureItem {
   updated_at: string;
 }
 
+
+/**
+ * Small label, title and description at the top of a page section — one row
+ * per (page_slug, section_key); keys are listed in lib/section-headings.ts.
+ */
+export interface SectionHeadingRow {
+  id: string;
+  page_slug: string;
+  section_key: string;
+  eyebrow_ar: string;
+  eyebrow_en: string;
+  /** Wrap words in *asterisks* to color them with the brand gradient. */
+  title_ar: string;
+  title_en: string;
+  description_ar: string;
+  description_en: string;
+  created_at: string;
+  updated_at: string;
+}

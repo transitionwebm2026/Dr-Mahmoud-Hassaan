@@ -7,14 +7,17 @@ import { ArrowLeft, ArrowRight, MessageSquareQuote, Quote, Star } from "lucide-r
 import { useLanguage } from "@/context/LanguageContext";
 import { pick } from "@/lib/i18n";
 import type { Review } from "@/lib/supabase/types";
+import SectionHeading from "@/components/ui/SectionHeading";
+import type { SectionHeadingContent } from "@/lib/section-headings";
 
 const AUTO_SCROLL_MS = 3800;
 
 export interface ReviewsSliderProps {
+  heading: SectionHeadingContent;
   reviews: Review[];
 }
 
-export default function ReviewsSlider({ reviews }: ReviewsSliderProps) {
+export default function ReviewsSlider({ reviews, heading }: ReviewsSliderProps) {
   const { lang } = useLanguage();
   const trackRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
@@ -63,13 +66,7 @@ export default function ReviewsSlider({ reviews }: ReviewsSliderProps) {
           transition={{ duration: 0.6 }}
           className="mx-auto flex max-w-2xl flex-col items-center text-center"
         >
-          <span className="section-eyebrow">
-            <MessageSquareQuote className="h-4 w-4" />
-            {pick(lang, { ar: "آراء المرضى", en: "Patient Reviews" })}
-          </span>
-          <h2 className="mt-5 text-2xl font-extrabold text-ink sm:text-3xl lg:text-4xl">
-            {pick(lang, { ar: "ماذا يقول مرضانا؟", en: "What Our Patients Say" })}
-          </h2>
+          <SectionHeading heading={heading} icon={MessageSquareQuote} />
         </motion.div>
 
         <div

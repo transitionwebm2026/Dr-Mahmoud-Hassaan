@@ -5,6 +5,7 @@ import PatientReviewsGrid from "@/components/sections/reviews/PatientReviewsGrid
 import { CONTACT } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/server";
 import { toBilingual } from "@/lib/supabase/content";
+import { resolveSectionHeadings } from "@/lib/section-headings";
 
 export const metadata: Metadata = {
   title: "آراء المرضى | Patient Reviews",
@@ -18,13 +19,15 @@ export const revalidate = 60;
 export default async function ReviewsPage() {
   const supabase = await createClient();
 
-  const [heroRes, settingsRes, reviewsRes] = await Promise.all([
+  const [heroRes, settingsRes, reviewsRes, headingsRes] = await Promise.all([
     supabase.from("pages_hero").select("*").eq("page_slug", "reviews").maybeSingle(),
     supabase.from("clinic_settings").select("*").limit(1).maybeSingle(),
     supabase.from("reviews").select("*").eq("is_published", true).order("review_date", { ascending: false }),
+    supabase.from("section_headings").select("*").eq("page_slug", "reviews"),
   ]);
 
   const hero = heroRes.data;
+  const headings = resolveSectionHeadings("reviews", headingsRes.data);
 
   return (
     <>
@@ -62,7 +65,7 @@ export default async function ReviewsPage() {
         settings={settingsRes.data}
       />
 
-      <PatientReviewsGrid reviews={reviewsRes.data ?? []} />
+      <PatientReviewsGrid heading={headings.grid} reviews={reviewsRes.data ?? []} />
 
       <FooterCTA
         title={

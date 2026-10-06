@@ -9,6 +9,7 @@ import FaqJsonLd from "@/components/seo/FaqJsonLd";
 import { CONTACT } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/server";
 import { toBilingual } from "@/lib/supabase/content";
+import { resolveSectionHeadings } from "@/lib/section-headings";
 
 export const metadata: Metadata = {
   title: "الخدمات والجراحات | Services & Surgeries",
@@ -22,7 +23,7 @@ export const revalidate = 60;
 export default async function ServicesPage() {
   const supabase = await createClient();
 
-  const [heroRes, settingsRes, surgeriesRes, protocolRes, categoriesRes, itemsRes, faqsRes] = await Promise.all([
+  const [heroRes, settingsRes, surgeriesRes, protocolRes, categoriesRes, itemsRes, faqsRes, headingsRes] = await Promise.all([
     supabase.from("pages_hero").select("*").eq("page_slug", "services").maybeSingle(),
     supabase.from("clinic_settings").select("*").limit(1).maybeSingle(),
     supabase.from("surgeries_services").select("*").eq("is_published", true).order("order_index"),
@@ -30,9 +31,11 @@ export default async function ServicesPage() {
     supabase.from("procedure_categories").select("*").order("order_index"),
     supabase.from("procedure_items").select("*").order("order_index"),
     supabase.from("faqs").select("*").eq("category", "services").order("order_index"),
+    supabase.from("section_headings").select("*").eq("page_slug", "services"),
   ]);
 
   const hero = heroRes.data;
+  const headings = resolveSectionHeadings("services", headingsRes.data);
 
   return (
     <>
@@ -65,13 +68,13 @@ export default async function ServicesPage() {
         settings={settingsRes.data}
       />
 
-      <TreatmentProtocol steps={protocolRes.data ?? []} />
+      <TreatmentProtocol heading={headings.treatment_protocol} steps={protocolRes.data ?? []} />
 
-      <SurgeriesGrid items={surgeriesRes.data ?? []} />
+      <SurgeriesGrid heading={headings.surgeries_grid} items={surgeriesRes.data ?? []} />
 
-      <ProceduresBreakdown categories={categoriesRes.data ?? []} items={itemsRes.data ?? []} />
+      <ProceduresBreakdown heading={headings.procedures} categories={categoriesRes.data ?? []} items={itemsRes.data ?? []} />
 
-      <ServicesFAQ faqs={faqsRes.data ?? []} />
+      <ServicesFAQ heading={headings.faq} faqs={faqsRes.data ?? []} />
       <FaqJsonLd faqs={faqsRes.data ?? []} />
 
       <FooterCTA

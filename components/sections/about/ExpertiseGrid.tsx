@@ -8,12 +8,15 @@ import { useLanguage } from "@/context/LanguageContext";
 import { pick } from "@/lib/i18n";
 import type { SurgeryService } from "@/lib/supabase/types";
 import GlassCard from "@/components/GlassCard";
+import SectionHeading from "@/components/ui/SectionHeading";
+import type { SectionHeadingContent } from "@/lib/section-headings";
 
 export interface ExpertiseGridProps {
+  heading: SectionHeadingContent;
   items: SurgeryService[];
 }
 
-export default function ExpertiseGrid({ items }: ExpertiseGridProps) {
+export default function ExpertiseGrid({ items, heading }: ExpertiseGridProps) {
   const { lang } = useLanguage();
   const ArrowIcon = lang === "ar" ? ArrowLeft : ArrowRight;
 
@@ -29,19 +32,7 @@ export default function ExpertiseGrid({ items }: ExpertiseGridProps) {
           transition={{ duration: 0.6 }}
           className="mx-auto max-w-2xl text-center"
         >
-          <span className="section-eyebrow">
-            <ScanSearch className="h-4 w-4" />
-            {pick(lang, { ar: "مجالات الخبرة والتخصص", en: "Areas of Expertise" })}
-          </span>
-          <h2 className="mt-5 text-2xl font-extrabold text-ink sm:text-3xl lg:text-4xl">
-            {pick(lang, { ar: "تخصص دقيق في كل حالة", en: "Precision Focus in Every Case" })}
-          </h2>
-          <p className="mt-4 text-sm leading-relaxed text-ink/60 sm:text-base">
-            {pick(lang, {
-              ar: "سنوات من الممارسة المتخصصة في أكثر مجالات جراحة الأورام دقة وحساسية.",
-              en: "Years of focused practice in some of the most precise and delicate fields of surgical oncology.",
-            })}
-          </p>
+          <SectionHeading heading={heading} icon={ScanSearch} />
         </motion.div>
 
         <div className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">

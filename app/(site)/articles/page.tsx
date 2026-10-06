@@ -5,6 +5,7 @@ import ArticlesSection from "@/components/sections/articles/ArticlesSection";
 import { CONTACT } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/server";
 import { toBilingual } from "@/lib/supabase/content";
+import { resolveSectionHeadings } from "@/lib/section-headings";
 
 export const metadata: Metadata = {
   title: "المقالات | Medical Articles",
@@ -18,7 +19,7 @@ export const revalidate = 60;
 export default async function ArticlesPage() {
   const supabase = await createClient();
 
-  const [heroRes, settingsRes, articlesRes] = await Promise.all([
+  const [heroRes, settingsRes, articlesRes, headingsRes] = await Promise.all([
     supabase.from("pages_hero").select("*").eq("page_slug", "articles").maybeSingle(),
     supabase.from("clinic_settings").select("*").limit(1).maybeSingle(),
     supabase
@@ -27,9 +28,11 @@ export default async function ArticlesPage() {
       .eq("is_published", true)
       .order("is_hero_featured", { ascending: false })
       .order("published_at", { ascending: false }),
+    supabase.from("section_headings").select("*").eq("page_slug", "articles"),
   ]);
 
   const hero = heroRes.data;
+  const headings = resolveSectionHeadings("articles", headingsRes.data);
 
   return (
     <>
@@ -62,7 +65,7 @@ export default async function ArticlesPage() {
         settings={settingsRes.data}
       />
 
-      <ArticlesSection articles={articlesRes.data ?? []} />
+      <ArticlesSection articles={articlesRes.data ?? []} headings={headings} />
 
       <FooterCTA
         title={

@@ -7,14 +7,17 @@ import { pick } from "@/lib/i18n";
 import { DOCTOR } from "@/lib/constants";
 import FallbackImage from "@/components/ui/FallbackImage";
 import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
+import SectionHeading from "@/components/ui/SectionHeading";
+import type { SectionHeadingContent } from "@/lib/section-headings";
 
 export interface DoctorMessageProps {
+  heading: SectionHeadingContent;
   paragraphsAr: string[];
   paragraphsEn: string[];
   imageSrc?: string | null;
 }
 
-export default function DoctorMessage({ paragraphsAr, paragraphsEn, imageSrc }: DoctorMessageProps) {
+export default function DoctorMessage({ paragraphsAr, paragraphsEn, imageSrc, heading }: DoctorMessageProps) {
   const { lang } = useLanguage();
   const messageParagraphs =
     paragraphsAr.length === paragraphsEn.length && paragraphsAr.length > 0
@@ -58,17 +61,11 @@ export default function DoctorMessage({ paragraphsAr, paragraphsEn, imageSrc }: 
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           className="text-center lg:text-start"
         >
-          <span className="section-eyebrow">
-            <Quote className="h-4 w-4" />
-            {pick(lang, { ar: "كلمة من الدكتور", en: "A Message From the Doctor" })}
-          </span>
-
-          <h2 className="mt-5 text-2xl font-extrabold text-ink sm:text-3xl lg:text-4xl">
-            {pick(lang, {
-              ar: "رحلتي معكم تبدأ من هنا",
-              en: "My journey with you starts here",
-            })}
-          </h2>
+          <SectionHeading
+            heading={heading}
+            icon={Quote}
+            descriptionClassName="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-ink/65 sm:text-base lg:mx-0"
+          />
 
           <div className="mx-auto mt-6 max-w-xl space-y-4 lg:mx-0">
             {messageParagraphs.map((p) => (

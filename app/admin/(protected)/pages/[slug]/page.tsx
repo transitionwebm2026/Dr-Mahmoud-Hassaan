@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { PAGE_SECTIONS } from "@/lib/admin/nav";
 import PageHeroForm from "@/components/admin/pages/PageHeroForm";
+import SectionHeadingForm from "@/components/admin/pages/SectionHeadingForm";
 import IntroVideoForm from "@/components/admin/pages/IntroVideoForm";
 import WhyDoctorManager from "@/components/admin/pages/WhyDoctorManager";
 import PatientJourneyManager from "@/components/admin/pages/PatientJourneyManager";
@@ -18,7 +19,8 @@ import FaqManager from "@/components/admin/faqs/FaqManager";
 import DoctorProfileForm from "@/components/admin/doctor-profile/DoctorProfileForm";
 import ClinicSettingsForm from "@/components/admin/settings/ClinicSettingsForm";
 import AppointmentsTable from "@/components/admin/appointments/AppointmentsTable";
-import type { DoctorProfile } from "@/lib/supabase/types";
+import { getSectionHeadingFormData, type SectionHeadingPage } from "@/lib/section-headings";
+import type { DoctorProfile, SectionHeadingRow } from "@/lib/supabase/types";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +28,7 @@ function SectionBlock({ title, children }: { title: string; children: React.Reac
   return (
     <div className="border-t border-ink/10 pt-6">
       <h2 className="mb-3 text-sm font-bold uppercase tracking-wide text-ink/45">{title}</h2>
-      {children}
+      <div className="space-y-4">{children}</div>
     </div>
   );
 }
@@ -38,8 +40,18 @@ export default async function AdminPageSectionEditor({ params }: { params: Promi
 
   const supabase = await createClient();
 
-  const hero = (await supabase.from("pages_hero").select("*").eq("page_slug", slug).maybeSingle()).data;
+  const [heroRes, headingsRes] = await Promise.all([
+    supabase.from("pages_hero").select("*").eq("page_slug", slug).maybeSingle(),
+    supabase.from("section_headings").select("*").eq("page_slug", slug),
+  ]);
+  const hero = heroRes.data;
   if (!hero) notFound();
+
+  const headingRows = headingsRes.data as SectionHeadingRow[] | null;
+  const headingForm = (sectionKey: string) => {
+    const { label, fields } = getSectionHeadingFormData(slug as SectionHeadingPage, sectionKey, headingRows);
+    return <SectionHeadingForm pageSlug={slug} sectionKey={sectionKey} label={label} heading={fields} />;
+  };
 
   let extraSections: React.ReactNode = null;
 
@@ -69,33 +81,39 @@ export default async function AdminPageSectionEditor({ params }: { params: Promi
           </p>
         </SectionBlock>
 
-        {profile && (
-          <SectionBlock title="Doctor Intro Video & Highlights">
-            <IntroVideoForm profile={profile} />
-          </SectionBlock>
-        )}
+        <SectionBlock title="Doctor Intro Video & Highlights">
+          {headingForm("intro_video")}
+          {profile && <IntroVideoForm profile={profile} />}
+        </SectionBlock>
 
         <SectionBlock title="Key Surgeries & Key Treatments">
+          {headingForm("key_surgeries")}
+          {headingForm("key_treatments")}
           <SurgeriesTreatmentsManager surgeries={surgeriesRes.data ?? []} treatments={treatmentsRes.data ?? []} />
         </SectionBlock>
 
         <SectionBlock title="Why Choose the Doctor">
+          {headingForm("why_doctor")}
           <WhyDoctorManager points={whyDoctorRes.data ?? []} />
         </SectionBlock>
 
         <SectionBlock title="Patient Journey">
+          {headingForm("patient_journey")}
           <PatientJourneyManager steps={journeyRes.data ?? []} />
         </SectionBlock>
 
         <SectionBlock title="Patient Reviews Slider">
+          {headingForm("reviews")}
           <ReviewManager reviews={reviewsRes.data ?? []} />
         </SectionBlock>
 
         <SectionBlock title="Featured Videos">
+          {headingForm("featured_videos")}
           <VideoManager videos={videosRes.data ?? []} />
         </SectionBlock>
 
         <SectionBlock title="FAQ (Home)">
+          {headingForm("faq")}
           <FaqManager faqs={faqsRes.data ?? []} defaultCategory="home" />
         </SectionBlock>
       </>
@@ -112,14 +130,17 @@ export default async function AdminPageSectionEditor({ params }: { params: Promi
     extraSections = (
       <>
         <SectionBlock title="Doctor Profile (name, bio, message & stats)">
+          {headingForm("doctor_message")}
           <DoctorProfileForm profile={profileRes.data} />
         </SectionBlock>
 
         <SectionBlock title="Career Timeline">
+          {headingForm("career_timeline")}
           <CareerMilestonesManager milestones={milestonesRes.data ?? []} />
         </SectionBlock>
 
         <SectionBlock title="Introductory Video">
+          {headingForm("intro_video")}
           <p className="glass-card p-5 text-sm text-ink/60">
             Uses the same intro video configured on the{" "}
             <Link href="/admin/pages/home" className="font-bold text-brand-700 hover:underline">
@@ -130,10 +151,12 @@ export default async function AdminPageSectionEditor({ params }: { params: Promi
         </SectionBlock>
 
         <SectionBlock title="Areas of Expertise">
+          {headingForm("expertise")}
           <SurgeriesTreatmentsManager surgeries={surgeriesRes.data ?? []} treatments={treatmentsRes.data ?? []} />
         </SectionBlock>
 
         <SectionBlock title="Certificates & Accreditations">
+          {headingForm("certifications")}
           <CertificationsManager certifications={certsRes.data ?? []} />
         </SectionBlock>
       </>
@@ -151,18 +174,22 @@ export default async function AdminPageSectionEditor({ params }: { params: Promi
     extraSections = (
       <>
         <SectionBlock title="Finding the Right Treatment Plan">
+          {headingForm("treatment_protocol")}
           <TreatmentProtocolManager steps={protocolRes.data ?? []} />
         </SectionBlock>
 
         <SectionBlock title="Specialized Surgeries Grid">
+          {headingForm("surgeries_grid")}
           <SurgeriesTreatmentsManager surgeries={surgeriesRes.data ?? []} treatments={treatmentsRes.data ?? []} />
         </SectionBlock>
 
         <SectionBlock title="Procedures & Conditions Breakdown">
+          {headingForm("procedures")}
           <ProcedureBreakdownManager categories={categoriesRes.data ?? []} items={itemsRes.data ?? []} />
         </SectionBlock>
 
         <SectionBlock title="Extended Clinical FAQ">
+          {headingForm("faq")}
           <FaqManager faqs={faqsRes.data ?? []} defaultCategory="services" />
         </SectionBlock>
       </>
@@ -171,6 +198,7 @@ export default async function AdminPageSectionEditor({ params }: { params: Promi
     const videosRes = await supabase.from("videos").select("*").order("order_index");
     extraSections = (
       <SectionBlock title="Video Library Grid">
+        {headingForm("library")}
         <VideoManager videos={videosRes.data ?? []} />
       </SectionBlock>
     );
@@ -178,6 +206,8 @@ export default async function AdminPageSectionEditor({ params }: { params: Promi
     const articlesRes = await supabase.from("articles").select("*").order("published_at", { ascending: false });
     extraSections = (
       <SectionBlock title="Featured Article + Articles Grid">
+        {headingForm("featured")}
+        {headingForm("grid")}
         <ArticleManager articles={articlesRes.data ?? []} />
       </SectionBlock>
     );
@@ -185,6 +215,7 @@ export default async function AdminPageSectionEditor({ params }: { params: Promi
     const reviewsRes = await supabase.from("reviews").select("*").order("review_date", { ascending: false });
     extraSections = (
       <SectionBlock title="Patient Reviews Grid">
+        {headingForm("grid")}
         <ReviewManager reviews={reviewsRes.data ?? []} />
       </SectionBlock>
     );
@@ -196,6 +227,8 @@ export default async function AdminPageSectionEditor({ params }: { params: Promi
 
     extraSections = (
       <>
+        <SectionBlock title="Booking & Contact Section">{headingForm("booking")}</SectionBlock>
+
         <SectionBlock title="Booking Form Submissions (Consultation Requests)">
           <AppointmentsTable appointments={appointmentsRes.data ?? []} />
         </SectionBlock>

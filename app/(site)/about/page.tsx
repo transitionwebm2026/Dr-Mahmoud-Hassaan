@@ -9,6 +9,7 @@ import ExpertiseGrid from "@/components/sections/about/ExpertiseGrid";
 import Certifications from "@/components/sections/about/Certifications";
 import { createClient } from "@/lib/supabase/server";
 import { toBilingual, splitParagraphs } from "@/lib/supabase/content";
+import { resolveSectionHeadings } from "@/lib/section-headings";
 
 export const metadata: Metadata = {
   title: "عن الدكتور | About the Doctor",
@@ -22,17 +23,19 @@ export const revalidate = 60;
 export default async function AboutPage() {
   const supabase = await createClient();
 
-  const [heroRes, profileRes, settingsRes, milestonesRes, expertiseRes, certsRes] = await Promise.all([
+  const [heroRes, profileRes, settingsRes, milestonesRes, expertiseRes, certsRes, headingsRes] = await Promise.all([
     supabase.from("pages_hero").select("*").eq("page_slug", "about").maybeSingle(),
     supabase.from("doctor_profile").select("*").limit(1).maybeSingle(),
     supabase.from("clinic_settings").select("*").limit(1).maybeSingle(),
     supabase.from("career_milestones").select("*").order("order_index"),
     supabase.from("surgeries_services").select("*").eq("is_published", true).order("order_index").limit(3),
     supabase.from("certifications").select("*").order("order_index"),
+    supabase.from("section_headings").select("*").eq("page_slug", "about"),
   ]);
 
   const hero = heroRes.data;
   const profile = profileRes.data;
+  const headings = resolveSectionHeadings("about", headingsRes.data);
 
   return (
     <>
@@ -66,18 +69,19 @@ export default async function AboutPage() {
       />
 
       <DoctorMessage
+        heading={headings.doctor_message}
         paragraphsAr={splitParagraphs(profile?.message_ar)}
         paragraphsEn={splitParagraphs(profile?.message_en)}
         imageSrc={profile?.message_image_url}
       />
 
-      <CareerTimeline milestones={milestonesRes.data ?? []} />
+      <CareerTimeline heading={headings.career_timeline} milestones={milestonesRes.data ?? []} />
 
-      <AboutVideo videoUrl={profile?.intro_video_url} />
+      <AboutVideo heading={headings.intro_video} videoUrl={profile?.intro_video_url} />
 
-      <ExpertiseGrid items={expertiseRes.data ?? []} />
+      <ExpertiseGrid heading={headings.expertise} items={expertiseRes.data ?? []} />
 
-      <Certifications certifications={certsRes.data ?? []} />
+      <Certifications heading={headings.certifications} certifications={certsRes.data ?? []} />
 
       <StatsBar
         curedPatients={profile?.cured_patients}

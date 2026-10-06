@@ -51,6 +51,38 @@ export async function updatePageHero(
 }
 
 // ---------------------------------------------------------------------------
+// Section headings — small label, title & description atop each section.
+// Upserted on (page_slug, section_key) so a section works even before its
+// row has been seeded.
+// ---------------------------------------------------------------------------
+export async function saveSectionHeading(
+  slug: string,
+  sectionKey: string,
+  _prevState: CrudActionState,
+  formData: FormData
+): Promise<CrudActionState> {
+  const payload = {
+    page_slug: slug,
+    section_key: sectionKey,
+    eyebrow_ar: String(formData.get("eyebrow_ar") ?? "").trim(),
+    eyebrow_en: String(formData.get("eyebrow_en") ?? "").trim(),
+    title_ar: String(formData.get("title_ar") ?? "").trim(),
+    title_en: String(formData.get("title_en") ?? "").trim(),
+    description_ar: String(formData.get("description_ar") ?? "").trim(),
+    description_en: String(formData.get("description_en") ?? "").trim(),
+  };
+
+  if (!payload.title_ar || !payload.title_en) return { error: "Title (AR/EN) is required." };
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("section_headings").upsert(payload, { onConflict: "page_slug,section_key" });
+  if (error) return { error: error.message };
+
+  revalidatePagePaths(slug);
+  return undefined;
+}
+
+// ---------------------------------------------------------------------------
 // Home — Doctor Intro Video & highlights (doctor_profile columns only —
 // scoped so saving this small form never touches the rest of the profile).
 // ---------------------------------------------------------------------------

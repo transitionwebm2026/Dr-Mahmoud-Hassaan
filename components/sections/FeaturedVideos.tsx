@@ -9,16 +9,19 @@ import { ArrowLeft, ArrowRight, Clapperboard, Play } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { pick } from "@/lib/i18n";
 import type { Video } from "@/lib/supabase/types";
+import SectionHeading from "@/components/ui/SectionHeading";
+import type { SectionHeadingContent } from "@/lib/section-headings";
 
 // Only needed once a card is clicked, so it's split into its own chunk
 // instead of shipping in the initial page bundle for every visitor.
 const VideoPopup = dynamic(() => import("@/components/VideoPopup"), { ssr: false });
 
 export interface FeaturedVideosProps {
+  heading: SectionHeadingContent;
   videos: Video[];
 }
 
-export default function FeaturedVideos({ videos }: FeaturedVideosProps) {
+export default function FeaturedVideos({ videos, heading }: FeaturedVideosProps) {
   const { lang } = useLanguage();
   const ArrowIcon = lang === "ar" ? ArrowLeft : ArrowRight;
   const [selected, setSelected] = useState<number | null>(null);
@@ -35,13 +38,7 @@ export default function FeaturedVideos({ videos }: FeaturedVideosProps) {
           transition={{ duration: 0.6 }}
           className="mx-auto max-w-2xl text-center"
         >
-          <span className="section-eyebrow">
-            <Clapperboard className="h-4 w-4" />
-            {pick(lang, { ar: "فيديوهات مختارة", en: "Featured Videos" })}
-          </span>
-          <h2 className="mt-5 text-2xl font-extrabold text-ink sm:text-3xl lg:text-4xl">
-            {pick(lang, { ar: "محتوى توعوي مرئي", en: "Educational Video Content" })}
-          </h2>
+          <SectionHeading heading={heading} icon={Clapperboard} />
         </motion.div>
 
         <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3">

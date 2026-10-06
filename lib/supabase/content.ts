@@ -39,3 +39,8 @@ export function formatArticleDate(lang: Lang, iso: string): string {
 export function formatReadingTime(lang: Lang, minutes: number): string {
   return lang === "ar" ? `${minutes} دقائق قراءة` : `${minutes} min read`;
 }
+
+/** Drops the `*highlight*` markers from an admin heading for plain-text use (alt text, popup titles). */
+export function stripHighlight(value: string): string {
+  return value.replace(/\*([^*]+)\*/g, "$1");
+}

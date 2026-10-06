@@ -5,6 +5,7 @@ import VideoLibraryGrid from "@/components/sections/videos/VideoLibraryGrid";
 import { CONTACT } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/server";
 import { toBilingual } from "@/lib/supabase/content";
+import { resolveSectionHeadings } from "@/lib/section-headings";
 
 export const metadata: Metadata = {
   title: "الفيديوهات | Video Library",
@@ -18,13 +19,15 @@ export const revalidate = 60;
 export default async function VideosPage() {
   const supabase = await createClient();
 
-  const [heroRes, settingsRes, videosRes] = await Promise.all([
+  const [heroRes, settingsRes, videosRes, headingsRes] = await Promise.all([
     supabase.from("pages_hero").select("*").eq("page_slug", "videos").maybeSingle(),
     supabase.from("clinic_settings").select("*").limit(1).maybeSingle(),
     supabase.from("videos").select("*").eq("is_published", true).order("order_index"),
+    supabase.from("section_headings").select("*").eq("page_slug", "videos"),
   ]);
 
   const hero = heroRes.data;
+  const headings = resolveSectionHeadings("videos", headingsRes.data);
 
   return (
     <>
@@ -57,7 +60,7 @@ export default async function VideosPage() {
         settings={settingsRes.data}
       />
 
-      <VideoLibraryGrid videos={videosRes.data ?? []} />
+      <VideoLibraryGrid heading={headings.library} videos={videosRes.data ?? []} />
 
       <FooterCTA
         title={

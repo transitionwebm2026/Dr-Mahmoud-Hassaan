@@ -8,16 +8,20 @@ import { useLanguage } from "@/context/LanguageContext";
 import { pick } from "@/lib/i18n";
 import { DOCTOR } from "@/lib/constants";
 import FallbackImage from "@/components/ui/FallbackImage";
+import SectionHeading from "@/components/ui/SectionHeading";
+import type { SectionHeadingContent } from "@/lib/section-headings";
+import { stripHighlight } from "@/lib/supabase/content";
 
 // Only needed once the poster is clicked, so it's split into its own chunk
 // instead of shipping in the initial page bundle for every visitor.
 const VideoPopup = dynamic(() => import("@/components/VideoPopup"), { ssr: false });
 
 export interface AboutVideoProps {
+  heading: SectionHeadingContent;
   videoUrl?: string | null;
 }
 
-export default function AboutVideo({ videoUrl }: AboutVideoProps) {
+export default function AboutVideo({ videoUrl, heading }: AboutVideoProps) {
   const { lang } = useLanguage();
   const [open, setOpen] = useState(false);
 
@@ -31,19 +35,7 @@ export default function AboutVideo({ videoUrl }: AboutVideoProps) {
           transition={{ duration: 0.6 }}
           className="mx-auto max-w-2xl text-center"
         >
-          <span className="section-eyebrow">
-            <Sparkles className="h-4 w-4" />
-            {pick(lang, { ar: "فيديو تعريفي", en: "Introductory Video" })}
-          </span>
-          <h2 className="mt-5 text-2xl font-extrabold text-ink sm:text-3xl lg:text-4xl">
-            {pick(lang, { ar: "قصة الدكتور محمود حسان", en: "Dr. Mahmoud Hassan's Story" })}
-          </h2>
-          <p className="mt-4 text-sm leading-relaxed text-ink/60 sm:text-base">
-            {pick(lang, {
-              ar: "شاهد الفيديو للتعرف أكثر على رؤيته الطبية ونهجه في التعامل مع مرضى الأورام.",
-              en: "Watch to learn more about his medical vision and approach to caring for oncology patients.",
-            })}
-          </p>
+          <SectionHeading heading={heading} icon={Sparkles} />
         </motion.div>
 
         <motion.div
@@ -83,7 +75,7 @@ export default function AboutVideo({ videoUrl }: AboutVideoProps) {
           <VideoPopup
             src={videoUrl}
             poster="/images/video-poster.jpg"
-            title={pick(lang, { ar: "قصة الدكتور محمود حسان", en: "Dr. Mahmoud Hassan's Story" })}
+            title={stripHighlight(pick(lang, heading.title))}
             onClose={() => setOpen(false)}
           />
         )}

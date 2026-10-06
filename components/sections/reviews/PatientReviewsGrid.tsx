@@ -5,8 +5,11 @@ import { BadgeCheck, Quote, Sparkles, Star } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { pick } from "@/lib/i18n";
 import type { Review } from "@/lib/supabase/types";
+import SectionHeading from "@/components/ui/SectionHeading";
+import type { SectionHeadingContent } from "@/lib/section-headings";
 
 export interface PatientReviewsGridProps {
+  heading: SectionHeadingContent;
   reviews: Review[];
 }
 
@@ -30,7 +33,7 @@ function StarRating({ rating }: { rating: number }) {
   );
 }
 
-export default function PatientReviewsGrid({ reviews }: PatientReviewsGridProps) {
+export default function PatientReviewsGrid({ reviews, heading }: PatientReviewsGridProps) {
   const { lang } = useLanguage();
 
   if (reviews.length === 0) return null;
@@ -47,19 +50,7 @@ export default function PatientReviewsGrid({ reviews }: PatientReviewsGridProps)
           transition={{ duration: 0.6 }}
           className="mx-auto max-w-2xl text-center"
         >
-          <span className="section-eyebrow">
-            <Sparkles className="h-4 w-4" />
-            {pick(lang, { ar: "قصص حقيقية من مرضانا", en: "Real Stories From Our Patients" })}
-          </span>
-          <h2 className="mt-5 text-2xl font-extrabold text-ink sm:text-3xl lg:text-4xl">
-            {pick(lang, { ar: "تجارب موثّقة برحلة التعافي الكاملة", en: "Verified Experiences Across the Full Recovery Journey" })}
-          </h2>
-          <p className="mt-4 text-sm leading-relaxed text-ink/60 sm:text-base">
-            {pick(lang, {
-              ar: "كل تقييم هنا من مريض حقيقي خضع للعلاج على يد الدكتور محمود حسان وفريقه الطبي.",
-              en: "Every review here comes from a real patient treated by Dr. Mahmoud Hassan and his medical team.",
-            })}
-          </p>
+          <SectionHeading heading={heading} icon={Sparkles} />
         </motion.div>
 
         <div className="mt-14 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">

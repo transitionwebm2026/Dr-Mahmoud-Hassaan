@@ -9,13 +9,16 @@ import { pick } from "@/lib/i18n";
 import { DynamicIcon } from "@/lib/icon-registry";
 import type { ProcedureCategory, ProcedureItem } from "@/lib/supabase/types";
 import GlassCard from "@/components/GlassCard";
+import SectionHeading from "@/components/ui/SectionHeading";
+import type { SectionHeadingContent } from "@/lib/section-headings";
 
 export interface ProceduresBreakdownProps {
+  heading: SectionHeadingContent;
   categories: ProcedureCategory[];
   items: ProcedureItem[];
 }
 
-export default function ProceduresBreakdown({ categories, items }: ProceduresBreakdownProps) {
+export default function ProceduresBreakdown({ categories, items, heading }: ProceduresBreakdownProps) {
   const { lang } = useLanguage();
   const [active, setActive] = useState(0);
 
@@ -34,19 +37,7 @@ export default function ProceduresBreakdown({ categories, items }: ProceduresBre
           transition={{ duration: 0.6 }}
           className="mx-auto max-w-2xl text-center"
         >
-          <span className="section-eyebrow">
-            <ListTree className="h-4 w-4" />
-            {pick(lang, { ar: "تفاصيل الجراحات والأمراض", en: "Procedures & Conditions" })}
-          </span>
-          <h2 className="mt-5 text-2xl font-extrabold text-ink sm:text-3xl lg:text-4xl">
-            {pick(lang, { ar: "تعرف على تفاصيل كل تخصص", en: "Explore Each Specialty in Detail" })}
-          </h2>
-          <p className="mt-4 text-sm leading-relaxed text-ink/60 sm:text-base">
-            {pick(lang, {
-              ar: "اختر تخصصًا لعرض الحالات والإجراءات التي يتم التعامل معها ضمنه.",
-              en: "Select a specialty to see the specific conditions and procedures treated under it.",
-            })}
-          </p>
+          <SectionHeading heading={heading} icon={ListTree} />
         </motion.div>
 
         {/* Category filter */}

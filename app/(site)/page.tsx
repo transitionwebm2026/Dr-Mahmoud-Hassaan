@@ -13,6 +13,7 @@ import HomeFAQ from "@/components/sections/HomeFAQ";
 import FaqJsonLd from "@/components/seo/FaqJsonLd";
 import { createClient } from "@/lib/supabase/server";
 import { toBilingual, splitLines } from "@/lib/supabase/content";
+import { resolveSectionHeadings } from "@/lib/section-headings";
 
 export const metadata: Metadata = {
   title: "الرئيسية | Home",
@@ -26,7 +27,7 @@ export const revalidate = 60;
 export default async function HomePage() {
   const supabase = await createClient();
 
-  const [heroRes, profileRes, settingsRes, surgeriesRes, treatmentsRes, whyDoctorRes, journeyRes, reviewsRes, videosRes, faqsRes] =
+  const [heroRes, profileRes, settingsRes, surgeriesRes, treatmentsRes, whyDoctorRes, journeyRes, reviewsRes, videosRes, faqsRes, headingsRes] =
     await Promise.all([
       supabase.from("pages_hero").select("*").eq("page_slug", "home").maybeSingle(),
       supabase.from("doctor_profile").select("*").limit(1).maybeSingle(),
@@ -38,10 +39,12 @@ export default async function HomePage() {
       supabase.from("reviews").select("*").eq("is_published", true).order("review_date", { ascending: false }).limit(6),
       supabase.from("videos").select("*").eq("is_published", true).order("order_index").limit(3),
       supabase.from("faqs").select("*").eq("category", "home").order("order_index"),
+      supabase.from("section_headings").select("*").eq("page_slug", "home"),
     ]);
 
   const hero = heroRes.data;
   const profile = profileRes.data;
+  const headings = resolveSectionHeadings("home", headingsRes.data);
 
   return (
     <>
@@ -76,24 +79,25 @@ export default async function HomePage() {
       />
 
       <DoctorIntroVideo
+        heading={headings.intro_video}
         highlightsAr={splitLines(profile?.intro_highlights_ar)}
         highlightsEn={splitLines(profile?.intro_highlights_en)}
         videoUrl={profile?.intro_video_url}
       />
 
-      <KeySurgeries items={surgeriesRes.data ?? []} />
+      <KeySurgeries heading={headings.key_surgeries} items={surgeriesRes.data ?? []} />
 
-      <KeyTreatments items={treatmentsRes.data ?? []} />
+      <KeyTreatments heading={headings.key_treatments} items={treatmentsRes.data ?? []} />
 
-      <WhyChooseDoctor points={whyDoctorRes.data ?? []} />
+      <WhyChooseDoctor heading={headings.why_doctor} points={whyDoctorRes.data ?? []} />
 
-      <PatientJourney steps={journeyRes.data ?? []} />
+      <PatientJourney heading={headings.patient_journey} steps={journeyRes.data ?? []} />
 
-      <ReviewsSlider reviews={reviewsRes.data ?? []} />
+      <ReviewsSlider heading={headings.reviews} reviews={reviewsRes.data ?? []} />
 
-      <FeaturedVideos videos={videosRes.data ?? []} />
+      <FeaturedVideos heading={headings.featured_videos} videos={videosRes.data ?? []} />
 
-      <HomeFAQ faqs={faqsRes.data ?? []} />
+      <HomeFAQ heading={headings.faq} faqs={faqsRes.data ?? []} />
       <FaqJsonLd faqs={faqsRes.data ?? []} />
 
       <FooterCTA

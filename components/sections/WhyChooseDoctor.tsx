@@ -10,14 +10,17 @@ import { DOCTOR } from "@/lib/constants";
 import { useIsMobile } from "@/lib/useIsMobile";
 import { DynamicIcon } from "@/lib/icon-registry";
 import type { WhyDoctorPoint } from "@/lib/supabase/types";
+import SectionHeading from "@/components/ui/SectionHeading";
+import type { SectionHeadingContent } from "@/lib/section-headings";
 
 const AUTO_ADVANCE_MS = 4500;
 
 export interface WhyChooseDoctorProps {
+  heading: SectionHeadingContent;
   points: WhyDoctorPoint[];
 }
 
-export default function WhyChooseDoctor({ points }: WhyChooseDoctorProps) {
+export default function WhyChooseDoctor({ points, heading }: WhyChooseDoctorProps) {
   const { lang, dir } = useLanguage();
   const [active, setActive] = useState(0);
   const isMobile = useIsMobile();
@@ -53,15 +56,7 @@ export default function WhyChooseDoctor({ points }: WhyChooseDoctorProps) {
           transition={{ duration: 0.6 }}
           className="mx-auto max-w-2xl text-center"
         >
-          <span className="section-eyebrow">
-            <ShieldCheck className="h-4 w-4" />
-            {pick(lang, { ar: "لماذا نحن", en: "Why Choose Us" })}
-          </span>
-          <h2 className="mt-5 text-2xl font-extrabold text-ink sm:text-3xl lg:text-4xl">
-            {pick(lang, { ar: "لماذا تختار ", en: "Why Choose " })}
-            <span className="text-gradient-brand">{pick(lang, DOCTOR.name)}</span>
-            {pick(lang, { ar: "؟", en: "?" })}
-          </h2>
+          <SectionHeading heading={heading} icon={ShieldCheck} />
         </motion.div>
 
         <div className="mt-12 grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-stretch lg:gap-14">

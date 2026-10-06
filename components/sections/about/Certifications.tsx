@@ -7,6 +7,8 @@ import { useLanguage } from "@/context/LanguageContext";
 import { pick } from "@/lib/i18n";
 import { DynamicIcon } from "@/lib/icon-registry";
 import type { Certification } from "@/lib/supabase/types";
+import SectionHeading from "@/components/ui/SectionHeading";
+import type { SectionHeadingContent } from "@/lib/section-headings";
 
 function CertificationCard({
   cert,
@@ -74,12 +76,11 @@ function CertificationCard({
 }
 
 export interface CertificationsProps {
+  heading: SectionHeadingContent;
   certifications: Certification[];
 }
 
-export default function Certifications({ certifications }: CertificationsProps) {
-  const { lang } = useLanguage();
-
+export default function Certifications({ certifications, heading }: CertificationsProps) {
   return (
     <section className="relative px-4 py-20 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
@@ -90,16 +91,7 @@ export default function Certifications({ certifications }: CertificationsProps) 
           transition={{ duration: 0.6 }}
           className="mx-auto max-w-2xl text-center"
         >
-          <span className="section-eyebrow">
-            <BadgeCheck className="h-4 w-4" />
-            {pick(lang, { ar: "الشهادات والإنجازات", en: "Certificates & Accreditations" })}
-          </span>
-          <h2 className="mt-5 text-2xl font-extrabold text-ink sm:text-3xl lg:text-4xl">
-            {pick(lang, { ar: "اعتمادات موثوقة عالميًا", en: "Globally Trusted Credentials" })}
-          </h2>
-          <p className="mt-4 text-sm leading-relaxed text-ink/60 sm:text-base">
-            {pick(lang, { ar: "مرر المؤشر أو اضغط على البطاقة لمعرفة المزيد.", en: "Hover or tap a card to reveal more detail." })}
-          </p>
+          <SectionHeading heading={heading} icon={BadgeCheck} />
         </motion.div>
 
         <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
