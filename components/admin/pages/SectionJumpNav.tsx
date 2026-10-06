@@ -2,11 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ChevronDown, ListTree } from "lucide-react";
-
-/** DOM id for a page-editor section, derived from its title. */
-export function sectionAnchorId(title: string): string {
-  return `section-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`;
-}
+import { sectionAnchorId } from "@/lib/admin/nav";
 
 /**
  * Sticky "Jump to section" picker for the long page editors. A native

@@ -61,3 +61,12 @@ export function getLiveSitePath(pathname: string): string {
   const page = PAGE_SECTIONS.find((p) => pathname === `/admin/pages/${p.slug}`);
   return page && page.slug !== "home" ? `/${page.slug}` : "/";
 }
+
+/**
+ * DOM id for a page-editor section, derived from its title. Lives here (not
+ * in the "use client" SectionJumpNav) because the server-rendered page editor
+ * calls it too, and server code can't call functions from client modules.
+ */
+export function sectionAnchorId(title: string): string {
+  return `section-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`;
+}
