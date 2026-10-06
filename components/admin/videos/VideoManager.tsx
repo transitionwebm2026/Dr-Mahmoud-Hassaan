@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Plus, Pencil, PlayCircle } from "lucide-react";
+import { Plus, PlayCircle } from "lucide-react";
 import { DeleteButton } from "@/components/admin/ui/DeleteButton";
+import { EditButton } from "@/components/admin/ui/EditButton";
 import { deleteVideo } from "@/app/admin/(protected)/videos/actions";
 import type { Video } from "@/lib/supabase/types";
 import VideoForm from "./VideoForm";
@@ -13,7 +14,7 @@ export default function VideoManager({ videos }: { videos: Video[] }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <p className="text-sm text-ink/60">{videos.length} videos.</p>
         {panel === "closed" && (
           <button type="button" onClick={() => setPanel("new")} className="btn-outline-glass !py-2 !px-4 text-xs">
@@ -60,14 +61,7 @@ export default function VideoManager({ videos }: { videos: Video[] }) {
                 {video.title_ar}
               </p>
               <div className="mt-3 flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setPanel(video)}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-brand/30 bg-brand/5 px-3 py-1.5 text-xs font-semibold text-brand-700 transition hover:bg-brand/10"
-                >
-                  <Pencil className="h-3.5 w-3.5" />
-                  Edit
-                </button>
+                <EditButton onClick={() => setPanel(video)} />
                 <DeleteButton action={() => deleteVideo(video.id)} confirmMessage={`Delete "${video.title_en}"?`} />
               </div>
             </div>

@@ -1,9 +1,10 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { Plus, Pencil, X } from "lucide-react";
-import { FieldLabel, TextArea, TextInput, SubmitButton } from "@/components/admin/ui/FormControls";
+import { Plus, X } from "lucide-react";
+import { FieldLabel, TextArea, TextInput, SubmitButton, FormActions } from "@/components/admin/ui/FormControls";
 import { DeleteButton } from "@/components/admin/ui/DeleteButton";
+import { EditButton } from "@/components/admin/ui/EditButton";
 import { useActionFeedback } from "@/components/admin/ui/useActionFeedback";
 import {
   createPatientJourneyStep,
@@ -19,10 +20,10 @@ function PatientJourneyForm({ step, onDone }: { step?: PatientJourneyStep; onDon
   useActionFeedback(state, isPending, step ? "Step updated." : "Step added.", onDone);
 
   return (
-    <form action={formAction} className="glass-card space-y-4 p-5">
-      <div className="flex items-center justify-between">
+    <form action={formAction} className="glass-card space-y-4 p-4 sm:p-5">
+      <div className="flex items-center justify-between gap-3">
         <h4 className="text-sm font-extrabold text-ink">{step ? "Edit Step" : "Add Step"}</h4>
-        <button type="button" onClick={onDone} className="text-ink/40 hover:text-ink">
+        <button type="button" onClick={onDone} aria-label="Close" className="-m-2 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-ink/40 transition hover:bg-white/70 hover:text-ink">
           <X className="h-4 w-4" />
         </button>
       </div>
@@ -56,10 +57,10 @@ function PatientJourneyForm({ step, onDone }: { step?: PatientJourneyStep; onDon
           <TextInput id="pj_icon_url" name="icon_url" placeholder="e.g. ClipboardList" defaultValue={step?.icon_url ?? ""} />
         </div>
       </div>
-      <div className="flex justify-end gap-3 border-t border-ink/10 pt-3">
+      <FormActions>
         <button type="button" onClick={onDone} className="btn-outline-glass !py-2 !px-5 text-xs">Cancel</button>
         <SubmitButton className="!py-2 !px-5 text-xs">{step ? "Save" : "Add"}</SubmitButton>
-      </div>
+      </FormActions>
     </form>
   );
 }
@@ -69,7 +70,7 @@ export default function PatientJourneyManager({ steps }: { steps: PatientJourney
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <h3 className="text-base font-extrabold text-ink">Patient Journey Steps</h3>
         {panel === "closed" && (
           <button type="button" onClick={() => setPanel("new")} className="btn-outline-glass !py-2 !px-4 text-xs">
@@ -91,9 +92,7 @@ export default function PatientJourneyManager({ steps }: { steps: PatientJourney
               <p dir="rtl" className="truncate text-xs text-ink/55">{step.title_ar}</p>
             </div>
             <div className="flex shrink-0 items-center gap-1.5">
-              <button type="button" onClick={() => setPanel(step)} className="rounded-lg border border-brand/30 bg-brand/5 p-1.5 text-brand-700 hover:bg-brand/10">
-                <Pencil className="h-3.5 w-3.5" />
-              </button>
+              <EditButton onClick={() => setPanel(step)} iconOnly />
               <DeleteButton action={() => deletePatientJourneyStep(step.id)} label="" confirmMessage={`Delete "${step.title_en}"?`} />
             </div>
           </div>

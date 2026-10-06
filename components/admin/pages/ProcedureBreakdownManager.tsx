@@ -1,10 +1,11 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { Plus, Pencil, X, ChevronDown } from "lucide-react";
-import { FieldLabel, TextArea, TextInput, SubmitButton } from "@/components/admin/ui/FormControls";
+import { Plus, X, ChevronDown } from "lucide-react";
+import { FieldLabel, TextArea, TextInput, SubmitButton, FormActions } from "@/components/admin/ui/FormControls";
 import { MediaUploadField } from "@/components/admin/ui/MediaUploadField";
 import { DeleteButton } from "@/components/admin/ui/DeleteButton";
+import { EditButton } from "@/components/admin/ui/EditButton";
 import { useActionFeedback } from "@/components/admin/ui/useActionFeedback";
 import {
   createProcedureCategory,
@@ -23,10 +24,10 @@ function CategoryForm({ item, onDone }: { item?: ProcedureCategory; onDone: () =
   useActionFeedback(state, isPending, item ? "Category updated." : "Category added.", onDone);
 
   return (
-    <form action={formAction} className="glass-card space-y-4 p-5">
-      <div className="flex items-center justify-between">
+    <form action={formAction} className="glass-card space-y-4 p-4 sm:p-5">
+      <div className="flex items-center justify-between gap-3">
         <h4 className="text-sm font-extrabold text-ink">{item ? "Edit Category" : "Add Category"}</h4>
-        <button type="button" onClick={onDone} className="text-ink/40 hover:text-ink">
+        <button type="button" onClick={onDone} aria-label="Close" className="-m-2 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-ink/40 transition hover:bg-white/70 hover:text-ink">
           <X className="h-4 w-4" />
         </button>
       </div>
@@ -51,10 +52,10 @@ function CategoryForm({ item, onDone }: { item?: ProcedureCategory; onDone: () =
           <MediaUploadField name="image_url" label="Image" kind="image" defaultValue={item?.image_url} />
         </div>
       </div>
-      <div className="flex justify-end gap-3 border-t border-ink/10 pt-3">
+      <FormActions>
         <button type="button" onClick={onDone} className="btn-outline-glass !py-2 !px-5 text-xs">Cancel</button>
         <SubmitButton className="!py-2 !px-5 text-xs">{item ? "Save" : "Add"}</SubmitButton>
-      </div>
+      </FormActions>
     </form>
   );
 }
@@ -75,9 +76,9 @@ function ItemForm({
   return (
     <form action={formAction} className="space-y-3 rounded-2xl border border-brand/15 bg-white/50 p-4">
       <input type="hidden" name="category_id" value={categoryId} />
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <h5 className="text-xs font-extrabold text-ink">{item ? "Edit Procedure" : "Add Procedure"}</h5>
-        <button type="button" onClick={onDone} className="text-ink/40 hover:text-ink">
+        <button type="button" onClick={onDone} aria-label="Close" className="-m-2 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-ink/40 transition hover:bg-white/70 hover:text-ink">
           <X className="h-3.5 w-3.5" />
         </button>
       </div>
@@ -103,10 +104,10 @@ function ItemForm({
           <TextInput id={`pi_order_index_${item?.id ?? "new"}`} name="order_index" type="number" defaultValue={item?.order_index ?? 0} />
         </div>
       </div>
-      <div className="flex justify-end gap-2 pt-1">
-        <button type="button" onClick={onDone} className="btn-outline-glass !py-1.5 !px-4 text-[11px]">Cancel</button>
-        <SubmitButton className="!py-1.5 !px-4 text-[11px]">{item ? "Save" : "Add"}</SubmitButton>
-      </div>
+      <FormActions>
+        <button type="button" onClick={onDone} className="btn-outline-glass !py-2 !px-5 text-xs">Cancel</button>
+        <SubmitButton className="!py-2 !px-5 text-xs">{item ? "Save" : "Add"}</SubmitButton>
+      </FormActions>
     </form>
   );
 }
@@ -134,15 +135,14 @@ function CategoryCard({
           <div className="min-w-0">
             <p className="text-sm font-extrabold text-ink">{category.title_en}</p>
             <p dir="rtl" className="truncate text-xs text-ink/55">{category.title_ar}</p>
+            <p className="mt-0.5 text-[11px] font-bold text-brand-700 sm:hidden">{items.length} procedures</p>
           </div>
         </button>
-        <span className="shrink-0 rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-bold text-brand-700">
+        <span className="hidden shrink-0 rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-bold text-brand-700 sm:inline">
           {items.length} procedures
         </span>
         <div className="flex shrink-0 items-center gap-1.5">
-          <button type="button" onClick={() => setEditing(true)} className="rounded-lg border border-brand/30 bg-brand/5 p-1.5 text-brand-700 hover:bg-brand/10">
-            <Pencil className="h-3.5 w-3.5" />
-          </button>
+          <EditButton onClick={() => setEditing(true)} iconOnly />
           <DeleteButton
             action={() => deleteProcedureCategory(category.id)}
             label=""
@@ -163,9 +163,7 @@ function CategoryCard({
                   <p dir="rtl" className="truncate text-xs text-ink/55">{procedureItem.title_ar}</p>
                 </div>
                 <div className="flex shrink-0 items-center gap-1.5">
-                  <button type="button" onClick={() => setItemPanel(procedureItem)} className="rounded-lg border border-brand/30 bg-brand/5 p-1.5 text-brand-700 hover:bg-brand/10">
-                    <Pencil className="h-3 w-3" />
-                  </button>
+                  <EditButton onClick={() => setItemPanel(procedureItem)} iconOnly />
                   <DeleteButton
                     action={() => deleteProcedureItem(procedureItem.id)}
                     label=""
@@ -181,7 +179,7 @@ function CategoryCard({
             <button
               type="button"
               onClick={() => setItemPanel("new")}
-              className="flex w-full items-center justify-center gap-1.5 rounded-2xl border border-dashed border-brand/30 py-2.5 text-xs font-bold text-brand-700 hover:bg-brand/5"
+              className="flex min-h-11 w-full items-center justify-center gap-1.5 rounded-2xl border border-dashed border-brand/30 py-2.5 text-xs font-bold text-brand-700 hover:bg-brand/5"
             >
               <Plus className="h-3.5 w-3.5" />
               Add Procedure
@@ -204,7 +202,7 @@ export default function ProcedureBreakdownManager({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <h3 className="text-base font-extrabold text-ink">Procedures & Conditions Breakdown</h3>
         {!addingCategory && (
           <button type="button" onClick={() => setAddingCategory(true)} className="btn-outline-glass !py-2 !px-4 text-xs">

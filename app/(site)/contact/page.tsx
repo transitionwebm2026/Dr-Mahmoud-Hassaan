@@ -6,6 +6,7 @@ import { CONTACT } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/server";
 import { toBilingual } from "@/lib/supabase/content";
 import { resolveSectionHeadings } from "@/lib/section-headings";
+import { resolveFooterCta } from "@/lib/footer-cta";
 
 export const metadata: Metadata = {
   title: "تواصل معنا | Contact Us",
@@ -26,6 +27,7 @@ export default async function ContactPage() {
   ]);
 
   const hero = heroRes.data;
+  const footerCta = resolveFooterCta("contact", hero, settingsRes.data);
   const headings = resolveSectionHeadings("contact", headingsRes.data);
 
   return (
@@ -61,20 +63,7 @@ export default async function ContactPage() {
 
       <ContactFormMapSection heading={headings.booking} clinicSettings={settingsRes.data} />
 
-      <FooterCTA
-        title={
-          toBilingual(hero?.footer_cta_title_ar, hero?.footer_cta_title_en) ?? {
-            ar: "لا تزال لديك أسئلة؟",
-            en: "Still have questions?",
-          }
-        }
-        subtitle={
-          toBilingual(hero?.footer_cta_subtitle_ar, hero?.footer_cta_subtitle_en) ?? {
-            ar: "فريقنا على استعداد للرد فورًا — اختر الطريقة الأنسب لك للتواصل معنا.",
-            en: "Our team is ready to respond right away — pick whichever way works best for you.",
-          }
-        }
-      />
+      {footerCta && <FooterCTA cta={footerCta} />}
     </>
   );
 }

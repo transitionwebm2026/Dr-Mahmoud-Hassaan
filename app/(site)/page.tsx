@@ -14,6 +14,7 @@ import FaqJsonLd from "@/components/seo/FaqJsonLd";
 import { createClient } from "@/lib/supabase/server";
 import { toBilingual, splitLines } from "@/lib/supabase/content";
 import { resolveSectionHeadings } from "@/lib/section-headings";
+import { resolveFooterCta } from "@/lib/footer-cta";
 
 export const metadata: Metadata = {
   title: "الرئيسية | Home",
@@ -43,6 +44,7 @@ export default async function HomePage() {
     ]);
 
   const hero = heroRes.data;
+  const footerCta = resolveFooterCta("home", hero, settingsRes.data);
   const profile = profileRes.data;
   const headings = resolveSectionHeadings("home", headingsRes.data);
 
@@ -100,10 +102,7 @@ export default async function HomePage() {
       <HomeFAQ heading={headings.faq} faqs={faqsRes.data ?? []} />
       <FaqJsonLd faqs={faqsRes.data ?? []} />
 
-      <FooterCTA
-        title={toBilingual(hero?.footer_cta_title_ar, hero?.footer_cta_title_en)}
-        subtitle={toBilingual(hero?.footer_cta_subtitle_ar, hero?.footer_cta_subtitle_en)}
-      />
+      {footerCta && <FooterCTA cta={footerCta} />}
     </>
   );
 }

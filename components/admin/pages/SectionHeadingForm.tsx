@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { Heading } from "lucide-react";
-import { FieldLabel, TextArea, TextInput, SubmitButton } from "@/components/admin/ui/FormControls";
+import { FieldLabel, TextArea, TextInput, SubmitButton, FormActions } from "@/components/admin/ui/FormControls";
 import { useActionFeedback } from "@/components/admin/ui/useActionFeedback";
 import { saveSectionHeading, type CrudActionState } from "@/app/admin/(protected)/pages/actions";
 import type { SectionHeadingFields } from "@/lib/section-headings";
@@ -28,7 +28,7 @@ export default function SectionHeadingForm({
   const id = (field: string) => `${sectionKey}-heading-${field}`;
 
   return (
-    <form action={formAction} className="glass-card space-y-4 p-6">
+    <form action={formAction} className="glass-card space-y-4 p-4 sm:p-6">
       <div>
         <h3 className="flex items-center gap-2 text-sm font-extrabold text-ink">
           <Heading className="h-4 w-4 text-brand-700" />
@@ -72,9 +72,9 @@ export default function SectionHeadingForm({
         </div>
       </div>
 
-      <div className="flex justify-end border-t border-ink/10 pt-4">
+      <FormActions>
         <SubmitButton>Save Heading</SubmitButton>
-      </div>
+      </FormActions>
     </form>
   );
 }

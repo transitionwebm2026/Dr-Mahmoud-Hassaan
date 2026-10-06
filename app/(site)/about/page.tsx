@@ -10,6 +10,7 @@ import Certifications from "@/components/sections/about/Certifications";
 import { createClient } from "@/lib/supabase/server";
 import { toBilingual, splitParagraphs } from "@/lib/supabase/content";
 import { resolveSectionHeadings } from "@/lib/section-headings";
+import { resolveFooterCta } from "@/lib/footer-cta";
 
 export const metadata: Metadata = {
   title: "عن الدكتور | About the Doctor",
@@ -34,6 +35,7 @@ export default async function AboutPage() {
   ]);
 
   const hero = heroRes.data;
+  const footerCta = resolveFooterCta("about", hero, settingsRes.data);
   const profile = profileRes.data;
   const headings = resolveSectionHeadings("about", headingsRes.data);
 
@@ -89,20 +91,7 @@ export default async function AboutPage() {
         yearsExperience={profile?.years_experience}
       />
 
-      <FooterCTA
-        title={
-          toBilingual(hero?.footer_cta_title_ar, hero?.footer_cta_title_en) ?? {
-            ar: "هل لديك سؤال للدكتور محمود حسان؟",
-            en: "Have a question for Dr. Mahmoud Hassan?",
-          }
-        }
-        subtitle={
-          toBilingual(hero?.footer_cta_subtitle_ar, hero?.footer_cta_subtitle_en) ?? {
-            ar: "تواصل معنا اليوم وسيسعد فريقنا بالرد على استفساراتك وحجز موعدك.",
-            en: "Reach out today — our team is happy to answer your questions and book your visit.",
-          }
-        }
-      />
+      {footerCta && <FooterCTA cta={footerCta} />}
     </>
   );
 }

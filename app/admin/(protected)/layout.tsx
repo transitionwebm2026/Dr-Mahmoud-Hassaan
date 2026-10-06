@@ -21,9 +21,9 @@ export default async function ProtectedAdminLayout({
   }
 
   return (
-    <div className="flex">
+    <div className="flex flex-col lg:flex-row">
       <Sidebar adminEmail={user.email ?? "Admin"} />
-      <main className="min-w-0 flex-1 p-4 pt-6 lg:p-8">{children}</main>
+      <main className="min-w-0 flex-1 px-4 pb-16 pt-5 lg:p-8">{children}</main>
     </div>
   );
 }

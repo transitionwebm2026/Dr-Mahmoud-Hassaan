@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { X } from "lucide-react";
-import { FieldLabel, TextArea, TextInput, ToggleSwitch, SubmitButton } from "@/components/admin/ui/FormControls";
+import { FieldLabel, TextArea, TextInput, ToggleSwitch, SubmitButton, FormActions } from "@/components/admin/ui/FormControls";
 import { MediaUploadField } from "@/components/admin/ui/MediaUploadField";
 import { useActionFeedback } from "@/components/admin/ui/useActionFeedback";
 import { createSurgery, updateSurgery, type CrudActionState } from "@/app/admin/(protected)/surgeries-treatments/actions";
@@ -16,10 +16,10 @@ export default function SurgeryForm({ item, onDone }: { item?: SurgeryService; o
   useActionFeedback(state, isPending, item ? "Surgery updated." : "Surgery added.", onDone);
 
   return (
-    <form action={formAction} className="glass-card space-y-5 p-6">
-      <div className="flex items-center justify-between">
+    <form action={formAction} className="glass-card space-y-5 p-4 sm:p-6">
+      <div className="flex items-center justify-between gap-3">
         <h3 className="text-base font-extrabold text-ink">{item ? "Edit Surgery / Service" : "Add Surgery / Service"}</h3>
-        <button type="button" onClick={onDone} className="text-ink/40 hover:text-ink">
+        <button type="button" onClick={onDone} aria-label="Close" className="-m-2 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-ink/40 transition hover:bg-white/70 hover:text-ink">
           <X className="h-5 w-5" />
         </button>
       </div>
@@ -67,10 +67,10 @@ export default function SurgeryForm({ item, onDone }: { item?: SurgeryService; o
           <ToggleSwitch checked={isPublished} onChange={setIsPublished} label="Published" name="is_published" />
         </div>
       </div>
-      <div className="flex justify-end gap-3 border-t border-ink/10 pt-4">
+      <FormActions>
         <button type="button" onClick={onDone} className="btn-outline-glass !py-2.5 !px-6 text-sm">Cancel</button>
         <SubmitButton>{item ? "Save Changes" : "Add Surgery"}</SubmitButton>
-      </div>
+      </FormActions>
     </form>
   );
 }

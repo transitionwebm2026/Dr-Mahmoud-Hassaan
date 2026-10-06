@@ -13,10 +13,13 @@ import type { ClinicSettings } from "@/lib/supabase/types";
 export function getContactInfo(settings: ClinicSettings | null) {
   const phoneDisplay = settings?.emergency_line || settings?.phone_primary || CONTACT.phoneDisplay;
   const phoneHref = phoneDisplay === CONTACT.phoneDisplay ? CONTACT.phoneHref : `tel:${phoneDisplay.replace(/[^\d+]/g, "")}`;
+  const whatsappDigits = settings?.whatsapp_number?.replace(/\D/g, "");
+  const whatsappHref = whatsappDigits ? `https://wa.me/${whatsappDigits}` : CONTACT.whatsappHref;
 
   return {
     phoneDisplay,
     phoneHref,
+    whatsappHref,
     email: settings?.email || CONTACT.email,
     addressAr: settings?.address_ar || CONTACT.address.ar,
     addressEn: settings?.address_en || CONTACT.address.en,

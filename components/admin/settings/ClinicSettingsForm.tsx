@@ -14,7 +14,7 @@ export default function ClinicSettingsForm({ settings }: { settings: ClinicSetti
 
   return (
     <form action={formAction} className="space-y-6">
-      <div className="glass-card space-y-4 p-6">
+      <div className="glass-card space-y-4 p-4 sm:p-6">
         <h3 className="text-base font-extrabold text-ink">Location & Hours</h3>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
@@ -53,7 +53,7 @@ export default function ClinicSettingsForm({ settings }: { settings: ClinicSetti
         </div>
       </div>
 
-      <div className="glass-card space-y-4 p-6">
+      <div className="glass-card space-y-4 p-4 sm:p-6">
         <h3 className="text-base font-extrabold text-ink">Email</h3>
         <div>
           <FieldLabel htmlFor="email">Contact Email</FieldLabel>
@@ -61,7 +61,7 @@ export default function ClinicSettingsForm({ settings }: { settings: ClinicSetti
         </div>
       </div>
 
-      <div className="glass-card space-y-4 p-6">
+      <div className="glass-card space-y-4 p-4 sm:p-6">
         <h3 className="text-base font-extrabold text-ink">Social & Messaging Links</h3>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
@@ -83,7 +83,7 @@ export default function ClinicSettingsForm({ settings }: { settings: ClinicSetti
         </div>
       </div>
 
-      <div className="flex justify-end">
+      <div className="sticky bottom-4 z-10 flex justify-end">
         <SubmitButton>Save Settings</SubmitButton>
       </div>
     </form>

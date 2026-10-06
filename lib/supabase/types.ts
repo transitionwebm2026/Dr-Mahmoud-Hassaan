@@ -63,6 +63,19 @@ export interface PageHero {
   footer_cta_title_en: string | null;
   footer_cta_subtitle_ar: string | null;
   footer_cta_subtitle_en: string | null;
+  /** Bottom CTA banner controls (migration 0012) — see lib/footer-cta.ts. */
+  footer_cta_visible: boolean;
+  footer_cta_background_url: string | null;
+  footer_cta_primary_visible: boolean;
+  footer_cta_primary_text_ar: string | null;
+  footer_cta_primary_text_en: string | null;
+  /** Null = clinic phone from clinic_settings. */
+  footer_cta_primary_link: string | null;
+  footer_cta_secondary_visible: boolean;
+  footer_cta_secondary_text_ar: string | null;
+  footer_cta_secondary_text_en: string | null;
+  /** Null = clinic WhatsApp from clinic_settings. */
+  footer_cta_secondary_link: string | null;
   created_at: string;
   updated_at: string;
 }

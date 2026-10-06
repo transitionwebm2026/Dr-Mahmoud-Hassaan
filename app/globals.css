@@ -122,6 +122,13 @@ body {
   .icon-chip {
     @apply flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-gradient text-white shadow-glow-brand;
   }
+
+  /* Admin CMS: `clip` looks identical to `hidden` but doesn't make the card
+     a scroll container, so a form's sticky Save bar (FormActions) can stick
+     to the bottom of the phone screen instead of being trapped in the card. */
+  .admin-root .glass-card {
+    overflow: clip;
+  }
 }
 
 @layer utilities {

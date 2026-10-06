@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 // LanguageProvider used by the public `(site)` route group.
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div dir="ltr" lang="en" className="font-english min-h-screen bg-mesh-medical bg-mist">
+    <div dir="ltr" lang="en" className="admin-root font-english min-h-screen bg-mesh-medical bg-mist">
       {children}
       <Toaster position="top-right" richColors closeButton />
     </div>

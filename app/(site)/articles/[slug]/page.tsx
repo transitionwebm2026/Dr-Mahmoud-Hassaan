@@ -5,6 +5,7 @@ import ArticleContent from "@/components/sections/articles/ArticleContent";
 import { DOCTOR } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/server";
 import { getSiteUrl } from "@/lib/site-url";
+import { resolveFooterCta } from "@/lib/footer-cta";
 import type { Article } from "@/lib/supabase/types";
 
 export const revalidate = 60;
@@ -47,6 +48,14 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   const article = await getArticle(slug);
   if (!article) notFound();
 
+  // Article pages show the same bottom CTA banner as the Articles page.
+  const supabase = await createClient();
+  const [heroRes, settingsRes] = await Promise.all([
+    supabase.from("pages_hero").select("*").eq("page_slug", "articles").maybeSingle(),
+    supabase.from("clinic_settings").select("*").limit(1).maybeSingle(),
+  ]);
+  const footerCta = resolveFooterCta("articles", heroRes.data, settingsRes.data);
+
   const siteUrl = getSiteUrl();
   const jsonLd = {
     "@context": "https://schema.org",
@@ -66,7 +75,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <ArticleContent article={article} />
-      <FooterCTA />
+      {footerCta && <FooterCTA cta={footerCta} />}
     </>
   );
 }

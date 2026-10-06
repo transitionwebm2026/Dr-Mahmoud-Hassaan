@@ -36,7 +36,7 @@ export default function LoginForm({ next }: { next: string }) {
       initial={{ opacity: 0, y: 24, scale: 0.96 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      className="glass-panel relative w-full max-w-md overflow-hidden p-8 sm:p-10"
+      className="glass-panel relative w-full max-w-md overflow-hidden p-6 sm:p-10"
     >
       <div className="pointer-events-none absolute inset-0 rounded-3xl bg-gradient-to-br from-white/40 via-transparent to-transparent" />
       <div className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-inset ring-white/40" />
@@ -66,7 +66,7 @@ export default function LoginForm({ next }: { next: string }) {
                 required
                 autoComplete="email"
                 placeholder="admin@example.com"
-                className="w-full rounded-xl border border-ink/10 bg-white/80 py-3 ps-10 pe-3.5 text-sm text-ink shadow-inner-glass outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/25"
+                className="w-full rounded-xl border border-ink/10 bg-white/80 py-3 ps-10 pe-3.5 text-base text-ink shadow-inner-glass outline-none sm:text-sm transition focus:border-brand focus:ring-2 focus:ring-brand/25"
               />
             </div>
           </div>
@@ -84,7 +84,7 @@ export default function LoginForm({ next }: { next: string }) {
                 required
                 autoComplete="current-password"
                 placeholder="••••••••"
-                className="w-full rounded-xl border border-ink/10 bg-white/80 py-3 ps-10 pe-10 text-sm text-ink shadow-inner-glass outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/25"
+                className="w-full rounded-xl border border-ink/10 bg-white/80 py-3 ps-10 pe-10 text-base text-ink shadow-inner-glass outline-none sm:text-sm transition focus:border-brand focus:ring-2 focus:ring-brand/25"
               />
               <button
                 type="button"

@@ -47,3 +47,17 @@ export const ADMIN_NAV_ITEMS: AdminNavEntry[] = [
   },
   { href: "/admin/navbar-footer", label: "Navbar & Footer", icon: PanelTop },
 ];
+
+/** Short title for the current admin screen (shown in the mobile top bar). */
+export function getAdminScreenTitle(pathname: string): string {
+  const page = PAGE_SECTIONS.find((p) => pathname === `/admin/pages/${p.slug}`);
+  if (page) return `${page.label} Page`;
+  if (pathname.startsWith("/admin/navbar-footer")) return "Navbar & Footer";
+  return "Dashboard";
+}
+
+/** The public URL showing what the current admin screen edits. */
+export function getLiveSitePath(pathname: string): string {
+  const page = PAGE_SECTIONS.find((p) => pathname === `/admin/pages/${p.slug}`);
+  return page && page.slug !== "home" ? `/${page.slug}` : "/";
+}

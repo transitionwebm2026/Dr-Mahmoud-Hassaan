@@ -10,6 +10,7 @@ import { CONTACT } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/server";
 import { toBilingual } from "@/lib/supabase/content";
 import { resolveSectionHeadings } from "@/lib/section-headings";
+import { resolveFooterCta } from "@/lib/footer-cta";
 
 export const metadata: Metadata = {
   title: "الخدمات والجراحات | Services & Surgeries",
@@ -35,6 +36,7 @@ export default async function ServicesPage() {
   ]);
 
   const hero = heroRes.data;
+  const footerCta = resolveFooterCta("services", hero, settingsRes.data);
   const headings = resolveSectionHeadings("services", headingsRes.data);
 
   return (
@@ -77,20 +79,7 @@ export default async function ServicesPage() {
       <ServicesFAQ heading={headings.faq} faqs={faqsRes.data ?? []} />
       <FaqJsonLd faqs={faqsRes.data ?? []} />
 
-      <FooterCTA
-        title={
-          toBilingual(hero?.footer_cta_title_ar, hero?.footer_cta_title_en) ?? {
-            ar: "جاهز لبدء خطة علاجك؟",
-            en: "Ready to start your treatment plan?",
-          }
-        }
-        subtitle={
-          toBilingual(hero?.footer_cta_subtitle_ar, hero?.footer_cta_subtitle_en) ?? {
-            ar: "تواصل معنا اليوم لحجز استشارتك ومناقشة أنسب خطة جراحية لحالتك.",
-            en: "Reach out today to book your consultation and discuss the right surgical plan for your case.",
-          }
-        }
-      />
+      {footerCta && <FooterCTA cta={footerCta} />}
     </>
   );
 }

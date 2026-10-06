@@ -11,7 +11,7 @@ import type { ClinicSettings } from "@/lib/supabase/types";
 
 function Section({ title, description, children }: { title: string; description?: ReactNode; children: ReactNode }) {
   return (
-    <div className="glass-card space-y-4 p-6">
+    <div className="glass-card space-y-4 p-4 sm:p-6">
       <div>
         <h3 className="text-base font-extrabold text-ink">{title}</h3>
         {description && <p className="text-sm text-ink/50">{description}</p>}
@@ -152,7 +152,7 @@ export default function NavbarFooterForm({ settings }: { settings: ClinicSetting
         <BilingualField name="footer_disclaimer" label="Disclaimer" settings={settings} multiline />
       </Section>
 
-      <div className="sticky bottom-4 flex justify-end">
+      <div className="sticky bottom-4 z-10 flex justify-end">
         <SubmitButton>Save Settings</SubmitButton>
       </div>
     </form>

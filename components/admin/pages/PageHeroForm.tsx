@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { FieldLabel, TextArea, TextInput, SubmitButton } from "@/components/admin/ui/FormControls";
+import { FieldLabel, TextArea, TextInput, SubmitButton, FormActions } from "@/components/admin/ui/FormControls";
 import { MediaUploadField } from "@/components/admin/ui/MediaUploadField";
 import { useActionFeedback } from "@/components/admin/ui/useActionFeedback";
 import { updatePageHero, type CrudActionState } from "@/app/admin/(protected)/pages/actions";
@@ -14,7 +14,7 @@ export default function PageHeroForm({ hero }: { hero: PageHero }) {
   useActionFeedback(state, isPending, "Hero section saved.");
 
   return (
-    <form key={hero.id} action={formAction} className="glass-card space-y-5 p-6">
+    <form key={hero.id} action={formAction} className="glass-card space-y-5 p-4 sm:p-6">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <FieldLabel htmlFor="title_ar">Title (Arabic)</FieldLabel>
@@ -69,33 +69,9 @@ export default function PageHeroForm({ hero }: { hero: PageHero }) {
         </div>
       </div>
 
-      <div className="border-t border-ink/10 pt-5">
-        <h4 className="mb-3 text-sm font-extrabold text-ink">
-          Bottom CTA Banner <span className="font-normal text-ink/45">(leave blank to use the default copy)</span>
-        </h4>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div>
-            <FieldLabel htmlFor="footer_cta_title_ar">Title (Arabic)</FieldLabel>
-            <TextInput id="footer_cta_title_ar" name="footer_cta_title_ar" dir="rtl" defaultValue={hero.footer_cta_title_ar ?? ""} />
-          </div>
-          <div>
-            <FieldLabel htmlFor="footer_cta_title_en">Title (English)</FieldLabel>
-            <TextInput id="footer_cta_title_en" name="footer_cta_title_en" defaultValue={hero.footer_cta_title_en ?? ""} />
-          </div>
-          <div>
-            <FieldLabel htmlFor="footer_cta_subtitle_ar">Subtitle (Arabic)</FieldLabel>
-            <TextArea id="footer_cta_subtitle_ar" name="footer_cta_subtitle_ar" dir="rtl" rows={2} defaultValue={hero.footer_cta_subtitle_ar ?? ""} />
-          </div>
-          <div>
-            <FieldLabel htmlFor="footer_cta_subtitle_en">Subtitle (English)</FieldLabel>
-            <TextArea id="footer_cta_subtitle_en" name="footer_cta_subtitle_en" rows={2} defaultValue={hero.footer_cta_subtitle_en ?? ""} />
-          </div>
-        </div>
-      </div>
-
-      <div className="flex justify-end border-t border-ink/10 pt-4">
+      <FormActions>
         <SubmitButton>Save Hero Section</SubmitButton>
-      </div>
+      </FormActions>
     </form>
   );
 }

@@ -117,7 +117,7 @@ export function MediaUploadField({
             <button
               type="button"
               onClick={() => setUrl("")}
-              className="absolute -end-2 -top-2 rounded-full bg-ink/80 p-1 text-white transition hover:bg-rose-500"
+              className="absolute -end-2.5 -top-2.5 rounded-full bg-ink/80 p-1.5 text-white transition hover:bg-rose-500 sm:-end-2 sm:-top-2 sm:p-1"
               aria-label="Remove"
             >
               <X className="h-3 w-3" />

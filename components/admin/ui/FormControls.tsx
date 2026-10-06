@@ -21,8 +21,10 @@ export function FieldLabel({
   );
 }
 
+// text-base (16px) on phones: iOS Safari zooms the whole page in when a
+// field under 16px is focused.
 const fieldClasses =
-  "w-full rounded-xl border border-ink/10 bg-white/80 px-3.5 py-2.5 text-sm text-ink shadow-inner-glass outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/25 disabled:cursor-not-allowed disabled:opacity-60";
+  "w-full rounded-xl border border-ink/10 bg-white/80 px-3.5 py-2.5 text-base text-ink sm:text-sm shadow-inner-glass outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/25 disabled:cursor-not-allowed disabled:opacity-60";
 
 export function TextInput(props: InputHTMLAttributes<HTMLInputElement>) {
   return <input {...props} className={`${fieldClasses} ${props.className ?? ""}`} />;
@@ -56,7 +58,7 @@ export function ToggleSwitch({
   name?: string;
 }) {
   return (
-    <label className="flex cursor-pointer select-none items-center gap-3">
+    <label className="flex min-h-11 cursor-pointer select-none items-center gap-3 sm:min-h-0">
       <span className="text-sm font-semibold text-ink/80">{label}</span>
       <span className="relative inline-flex h-6 w-11 items-center">
         <input
@@ -87,7 +89,7 @@ export function SubmitButton({
     <button
       type="submit"
       disabled={pending}
-      className={`btn-primary !py-2.5 !px-6 text-sm disabled:cursor-not-allowed disabled:opacity-70 ${className}`}
+      className={`btn-primary flex-1 !py-2.5 !px-6 text-sm disabled:cursor-not-allowed disabled:opacity-70 sm:flex-none ${className}`}
     >
       {pending ? (
         <>
@@ -98,5 +100,19 @@ export function SubmitButton({
         children
       )}
     </button>
+  );
+}
+
+/**
+ * The Cancel/Save row at the end of a form. On phones it sticks to the bottom
+ * of the screen while its form is in view, so Save stays one tap away on long
+ * forms, and its buttons grow to full-size touch targets. Expects the form to
+ * use `p-4` padding on phones (its negative margins bleed to the card edge).
+ */
+export function FormActions({ children }: { children: ReactNode }) {
+  return (
+    <div className="sticky bottom-0 z-10 -mx-4 -mb-4 flex items-center justify-end gap-3 border-t border-ink/10 bg-white/90 px-4 py-3 backdrop-blur-md [&_button]:min-h-11 sm:static sm:mx-0 sm:mb-0 sm:bg-transparent sm:px-0 sm:pb-0 sm:pt-4 sm:backdrop-blur-none sm:[&_button]:min-h-0">
+      {children}
+    </div>
   );
 }

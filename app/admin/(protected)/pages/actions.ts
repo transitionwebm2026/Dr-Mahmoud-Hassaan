@@ -36,10 +36,6 @@ export async function updatePageHero(
     cta_secondary_text_ar: String(formData.get("cta_secondary_text_ar") ?? "").trim() || null,
     cta_secondary_text_en: String(formData.get("cta_secondary_text_en") ?? "").trim() || null,
     cta_secondary_link: String(formData.get("cta_secondary_link") ?? "").trim() || null,
-    footer_cta_title_ar: String(formData.get("footer_cta_title_ar") ?? "").trim() || null,
-    footer_cta_title_en: String(formData.get("footer_cta_title_en") ?? "").trim() || null,
-    footer_cta_subtitle_ar: String(formData.get("footer_cta_subtitle_ar") ?? "").trim() || null,
-    footer_cta_subtitle_en: String(formData.get("footer_cta_subtitle_en") ?? "").trim() || null,
   };
 
   const supabase = await createClient();
@@ -47,6 +43,47 @@ export async function updatePageHero(
   if (error) return { error: error.message };
 
   revalidatePagePaths(slug);
+  return undefined;
+}
+
+// ---------------------------------------------------------------------------
+// Bottom CTA banner — same pages_hero row, its own form. Blank button text or
+// links are stored as null so the site falls back to the default copy and
+// the clinic phone / WhatsApp; a cleared subtitle is stored as '' (hidden).
+// ---------------------------------------------------------------------------
+export async function updateFooterCta(
+  id: string,
+  slug: string,
+  _prevState: CrudActionState,
+  formData: FormData
+): Promise<CrudActionState> {
+  const text = (name: string) => String(formData.get(name) ?? "").trim();
+  const payload = {
+    footer_cta_visible: formData.get("footer_cta_visible") === "on",
+    footer_cta_title_ar: text("footer_cta_title_ar"),
+    footer_cta_title_en: text("footer_cta_title_en"),
+    footer_cta_subtitle_ar: text("footer_cta_subtitle_ar"),
+    footer_cta_subtitle_en: text("footer_cta_subtitle_en"),
+    footer_cta_background_url: text("footer_cta_background_url") || null,
+    footer_cta_primary_visible: formData.get("footer_cta_primary_visible") === "on",
+    footer_cta_primary_text_ar: text("footer_cta_primary_text_ar") || null,
+    footer_cta_primary_text_en: text("footer_cta_primary_text_en") || null,
+    footer_cta_primary_link: text("footer_cta_primary_link") || null,
+    footer_cta_secondary_visible: formData.get("footer_cta_secondary_visible") === "on",
+    footer_cta_secondary_text_ar: text("footer_cta_secondary_text_ar") || null,
+    footer_cta_secondary_text_en: text("footer_cta_secondary_text_en") || null,
+    footer_cta_secondary_link: text("footer_cta_secondary_link") || null,
+  };
+
+  if (!payload.footer_cta_title_ar || !payload.footer_cta_title_en) return { error: "Title (AR/EN) is required." };
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("pages_hero").update(payload).eq("id", id);
+  if (error) return { error: error.message };
+
+  revalidatePagePaths(slug);
+  // Every article page shows the Articles page's banner too.
+  if (slug === "articles") revalidatePath("/(site)/articles/[slug]", "page");
   return undefined;
 }
 

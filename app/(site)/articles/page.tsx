@@ -6,6 +6,7 @@ import { CONTACT } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/server";
 import { toBilingual } from "@/lib/supabase/content";
 import { resolveSectionHeadings } from "@/lib/section-headings";
+import { resolveFooterCta } from "@/lib/footer-cta";
 
 export const metadata: Metadata = {
   title: "المقالات | Medical Articles",
@@ -32,6 +33,7 @@ export default async function ArticlesPage() {
   ]);
 
   const hero = heroRes.data;
+  const footerCta = resolveFooterCta("articles", hero, settingsRes.data);
   const headings = resolveSectionHeadings("articles", headingsRes.data);
 
   return (
@@ -67,20 +69,7 @@ export default async function ArticlesPage() {
 
       <ArticlesSection articles={articlesRes.data ?? []} headings={headings} />
 
-      <FooterCTA
-        title={
-          toBilingual(hero?.footer_cta_title_ar, hero?.footer_cta_title_en) ?? {
-            ar: "لديك سؤال بعد القراءة؟",
-            en: "Have a question after reading?",
-          }
-        }
-        subtitle={
-          toBilingual(hero?.footer_cta_subtitle_ar, hero?.footer_cta_subtitle_en) ?? {
-            ar: "فريقنا جاهز للإجابة عن استفساراتك وحجز استشارتك.",
-            en: "Our team is ready to answer your questions and book your consultation.",
-          }
-        }
-      />
+      {footerCta && <FooterCTA cta={footerCta} />}
     </>
   );
 }

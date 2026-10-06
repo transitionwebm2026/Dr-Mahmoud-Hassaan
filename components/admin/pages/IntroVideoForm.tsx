@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { FieldLabel, TextArea, SubmitButton } from "@/components/admin/ui/FormControls";
+import { FieldLabel, TextArea, SubmitButton, FormActions } from "@/components/admin/ui/FormControls";
 import { MediaUploadField } from "@/components/admin/ui/MediaUploadField";
 import { useActionFeedback } from "@/components/admin/ui/useActionFeedback";
 import { saveHomeIntroVideo, type CrudActionState } from "@/app/admin/(protected)/pages/actions";
@@ -13,7 +13,7 @@ export default function IntroVideoForm({ profile }: { profile: DoctorProfile }) 
   useActionFeedback(state, isPending, "Intro video saved.");
 
   return (
-    <form action={formAction} className="glass-card space-y-4 p-5">
+    <form action={formAction} className="glass-card space-y-4 p-4 sm:p-5">
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <MediaUploadField name="intro_video_url" label="Intro Video" kind="video" defaultValue={profile.intro_video_url} />
@@ -27,9 +27,9 @@ export default function IntroVideoForm({ profile }: { profile: DoctorProfile }) 
           <TextArea id="intro_highlights_en" name="intro_highlights_en" rows={4} defaultValue={profile.intro_highlights_en} />
         </div>
       </div>
-      <div className="flex justify-end border-t border-ink/10 pt-3">
+      <FormActions>
         <SubmitButton className="!py-2 !px-5 text-xs">Save</SubmitButton>
-      </div>
+      </FormActions>
     </form>
   );
 }

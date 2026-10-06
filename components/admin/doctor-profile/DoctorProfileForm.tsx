@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { FieldLabel, TextArea, TextInput, SubmitButton } from "@/components/admin/ui/FormControls";
+import { FieldLabel, TextArea, TextInput, SubmitButton, FormActions } from "@/components/admin/ui/FormControls";
 import { MediaUploadField } from "@/components/admin/ui/MediaUploadField";
 import { useActionFeedback } from "@/components/admin/ui/useActionFeedback";
 import { saveDoctorProfile, type DoctorProfileActionState } from "@/app/admin/(protected)/doctor-profile/actions";
@@ -14,7 +14,7 @@ export default function DoctorProfileForm({ profile }: { profile: DoctorProfile 
   useActionFeedback(state, isPending, "Doctor profile saved.");
 
   return (
-    <form action={formAction} className="glass-card space-y-5 p-6">
+    <form action={formAction} className="glass-card space-y-5 p-4 sm:p-6">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <FieldLabel htmlFor="name_ar" required>
@@ -114,9 +114,9 @@ export default function DoctorProfileForm({ profile }: { profile: DoctorProfile 
         </div>
       </div>
 
-      <div className="flex justify-end border-t border-ink/10 pt-4">
+      <FormActions>
         <SubmitButton>Save Profile</SubmitButton>
-      </div>
+      </FormActions>
     </form>
   );
 }

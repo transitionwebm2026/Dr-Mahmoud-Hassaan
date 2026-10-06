@@ -6,6 +6,7 @@ import { CONTACT } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/server";
 import { toBilingual } from "@/lib/supabase/content";
 import { resolveSectionHeadings } from "@/lib/section-headings";
+import { resolveFooterCta } from "@/lib/footer-cta";
 
 export const metadata: Metadata = {
   title: "الفيديوهات | Video Library",
@@ -27,6 +28,7 @@ export default async function VideosPage() {
   ]);
 
   const hero = heroRes.data;
+  const footerCta = resolveFooterCta("videos", hero, settingsRes.data);
   const headings = resolveSectionHeadings("videos", headingsRes.data);
 
   return (
@@ -62,20 +64,7 @@ export default async function VideosPage() {
 
       <VideoLibraryGrid heading={headings.library} videos={videosRes.data ?? []} />
 
-      <FooterCTA
-        title={
-          toBilingual(hero?.footer_cta_title_ar, hero?.footer_cta_title_en) ?? {
-            ar: "هل تريد استشارة شخصية؟",
-            en: "Want a personal consultation?",
-          }
-        }
-        subtitle={
-          toBilingual(hero?.footer_cta_subtitle_ar, hero?.footer_cta_subtitle_en) ?? {
-            ar: "الفيديوهات نقطة بداية — تواصل معنا للحصول على إجابات تخص حالتك تحديدًا.",
-            en: "These videos are a starting point — reach out for answers specific to your case.",
-          }
-        }
-      />
+      {footerCta && <FooterCTA cta={footerCta} />}
     </>
   );
 }

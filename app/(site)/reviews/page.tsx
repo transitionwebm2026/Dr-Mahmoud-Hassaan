@@ -6,6 +6,7 @@ import { CONTACT } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/server";
 import { toBilingual } from "@/lib/supabase/content";
 import { resolveSectionHeadings } from "@/lib/section-headings";
+import { resolveFooterCta } from "@/lib/footer-cta";
 
 export const metadata: Metadata = {
   title: "آراء المرضى | Patient Reviews",
@@ -27,6 +28,7 @@ export default async function ReviewsPage() {
   ]);
 
   const hero = heroRes.data;
+  const footerCta = resolveFooterCta("reviews", hero, settingsRes.data);
   const headings = resolveSectionHeadings("reviews", headingsRes.data);
 
   return (
@@ -67,20 +69,7 @@ export default async function ReviewsPage() {
 
       <PatientReviewsGrid heading={headings.grid} reviews={reviewsRes.data ?? []} />
 
-      <FooterCTA
-        title={
-          toBilingual(hero?.footer_cta_title_ar, hero?.footer_cta_title_en) ?? {
-            ar: "هل خضعت للعلاج معنا؟ شاركنا تجربتك",
-            en: "Been treated with us? Share your experience",
-          }
-        }
-        subtitle={
-          toBilingual(hero?.footer_cta_subtitle_ar, hero?.footer_cta_subtitle_en) ?? {
-            ar: "رأيك يساعد مرضى آخرين على اتخاذ قرارهم بثقة، وتواصلنا معك مستمر بعد التعافي.",
-            en: "Your feedback helps other patients decide with confidence — and our support continues well after recovery.",
-          }
-        }
-      />
+      {footerCta && <FooterCTA cta={footerCta} />}
     </>
   );
 }

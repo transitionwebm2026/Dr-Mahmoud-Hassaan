@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { X } from "lucide-react";
-import { FieldLabel, TextArea, TextInput, ToggleSwitch, SubmitButton } from "@/components/admin/ui/FormControls";
+import { FieldLabel, TextArea, TextInput, ToggleSwitch, SubmitButton, FormActions } from "@/components/admin/ui/FormControls";
 import { MediaUploadField } from "@/components/admin/ui/MediaUploadField";
 import { useActionFeedback } from "@/components/admin/ui/useActionFeedback";
 import { createVideo, updateVideo, type VideoActionState } from "@/app/admin/(protected)/videos/actions";
@@ -16,10 +16,10 @@ export default function VideoForm({ video, onDone }: { video?: Video; onDone: ()
   useActionFeedback(state, isPending, video ? "Video updated." : "Video added.", onDone);
 
   return (
-    <form action={formAction} className="glass-card space-y-5 p-6">
-      <div className="flex items-center justify-between">
+    <form action={formAction} className="glass-card space-y-5 p-4 sm:p-6">
+      <div className="flex items-center justify-between gap-3">
         <h3 className="text-base font-extrabold text-ink">{video ? "Edit Video" : "Add New Video"}</h3>
-        <button type="button" onClick={onDone} className="text-ink/40 hover:text-ink">
+        <button type="button" onClick={onDone} aria-label="Close" className="-m-2 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-ink/40 transition hover:bg-white/70 hover:text-ink">
           <X className="h-5 w-5" />
         </button>
       </div>
@@ -72,12 +72,12 @@ export default function VideoForm({ video, onDone }: { video?: Video; onDone: ()
         </div>
       </div>
 
-      <div className="flex justify-end gap-3 border-t border-ink/10 pt-4">
+      <FormActions>
         <button type="button" onClick={onDone} className="btn-outline-glass !py-2.5 !px-6 text-sm">
           Cancel
         </button>
         <SubmitButton>{video ? "Save Changes" : "Add Video"}</SubmitButton>
-      </div>
+      </FormActions>
     </form>
   );
 }

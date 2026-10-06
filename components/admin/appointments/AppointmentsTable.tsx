@@ -29,7 +29,7 @@ function StatusSelect({ id, status }: { id: string; status: AppointmentStatus })
       value={status}
       disabled={isPending}
       onChange={(e) => handleChange(e.target.value as AppointmentStatus)}
-      className={`rounded-full border-0 px-2.5 py-1 text-xs font-bold capitalize outline-none ${STATUS_STYLES[status]} disabled:opacity-60`}
+      className={`rounded-full border-0 px-3 py-1.5 text-base font-bold capitalize outline-none sm:px-2.5 sm:py-1 sm:text-xs ${STATUS_STYLES[status]} disabled:opacity-60`}
     >
       <option value="new">New</option>
       <option value="contacted">Contacted</option>
@@ -46,17 +46,17 @@ export default function AppointmentsTable({ appointments }: { appointments: Cont
   return (
     <div className="space-y-3">
       {appointments.map((row) => (
-        <div key={row.id} className="glass-card flex flex-wrap items-start justify-between gap-4 p-5">
+        <div key={row.id} className="glass-card flex items-start justify-between gap-3 p-4 sm:gap-4 sm:p-5">
           <div className="min-w-0 flex-1">
-            <div className="mb-1 flex items-center gap-2">
+            <div className="mb-1 flex flex-wrap items-center gap-2">
               <p className="font-bold text-ink">{row.name}</p>
               <StatusSelect id={row.id} status={row.status} />
             </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-ink/60">
-              <span className="flex items-center gap-1.5">
+              <a href={`tel:${row.phone}`} className="flex items-center gap-1.5 font-semibold text-brand-700 hover:underline">
                 <Phone className="h-3.5 w-3.5" />
                 {row.phone}
-              </span>
+              </a>
               {row.specialty && <span>{row.specialty}</span>}
               {row.preferred_date && (
                 <span className="flex items-center gap-1.5">

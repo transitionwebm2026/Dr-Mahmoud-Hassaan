@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { X, Star } from "lucide-react";
-import { FieldLabel, TextArea, TextInput, ToggleSwitch, SubmitButton } from "@/components/admin/ui/FormControls";
+import { FieldLabel, TextArea, TextInput, ToggleSwitch, SubmitButton, FormActions } from "@/components/admin/ui/FormControls";
 import { MediaUploadField } from "@/components/admin/ui/MediaUploadField";
 import { useActionFeedback } from "@/components/admin/ui/useActionFeedback";
 import { createReview, updateReview, type ReviewActionState } from "@/app/admin/(protected)/reviews/actions";
@@ -18,10 +18,10 @@ export default function ReviewForm({ review, onDone }: { review?: Review; onDone
   useActionFeedback(state, isPending, review ? "Review updated." : "Review added.", onDone);
 
   return (
-    <form action={formAction} className="glass-card space-y-5 p-6">
-      <div className="flex items-center justify-between">
+    <form action={formAction} className="glass-card space-y-5 p-4 sm:p-6">
+      <div className="flex items-center justify-between gap-3">
         <h3 className="text-base font-extrabold text-ink">{review ? "Edit Review" : "Add New Review"}</h3>
-        <button type="button" onClick={onDone} className="text-ink/40 hover:text-ink">
+        <button type="button" onClick={onDone} aria-label="Close" className="-m-2 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-ink/40 transition hover:bg-white/70 hover:text-ink">
           <X className="h-5 w-5" />
         </button>
       </div>
@@ -105,12 +105,12 @@ export default function ReviewForm({ review, onDone }: { review?: Review; onDone
         </div>
       </div>
 
-      <div className="flex justify-end gap-3 border-t border-ink/10 pt-4">
+      <FormActions>
         <button type="button" onClick={onDone} className="btn-outline-glass !py-2.5 !px-6 text-sm">
           Cancel
         </button>
         <SubmitButton>{review ? "Save Changes" : "Add Review"}</SubmitButton>
-      </div>
+      </FormActions>
     </form>
   );
 }
